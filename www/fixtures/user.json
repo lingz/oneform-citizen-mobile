@@ -1,0 +1,31 @@
+{
+	"_id": "123",
+	"internalId": "123",
+	"secret": "secret",
+	"salt": "(String)",
+	"profile": {
+		"firstName":"Rodrigo",
+		"lastName":"Ceballos",
+		"phoneNumber":"93287408",
+		"email":"sf@askdf.com"
+		},
+		"data": 
+		[
+		{
+			"_id": "f1",
+			"value": "Rodrigo",
+			"lastUpdated": "(String)"
+			},
+		{
+			"_id": "f2",
+			"value": "20",
+			"lastUpdated": "(String)"
+		}
+		],
+			"formsCompleted": 
+			[{
+				"_id": "(String - userIds that are authorized)",
+				"status": "(String - completed, error, processing)",
+				"timeStamp": "(DateTime)"
+			}]
+}

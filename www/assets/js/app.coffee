@@ -1,4 +1,5 @@
 "use strict"
+isDeveloper = true
 
 # Declare app level module which depends on filters, and services
 app = angular.module("myApp", ["ngRoute", "myApp.filters", "myApp.services", "myApp.controllers"])
@@ -8,7 +9,7 @@ app.config ["$routeProvider", ($routeProvider) ->
     templateUrl: "static/app/partials/input_fields.html"
     controller: "MyCtrl1",
     access:
-      isFree: false
+      isFree: isDeveloper
 
   $routeProvider.when "/sign_in",
     templateUrl: "static/app/partials/sign_in.html"
@@ -23,12 +24,12 @@ app.config ["$routeProvider", ($routeProvider) ->
   $routeProvider.when "/form_fill_up",
     templateUrl: "static/app/partials/userApp/form_fill_up.html"
     controller: "FormController",
-      isFree: false
+      isFree: isDeveloper
 
   $routeProvider.when "/all_forms",
     templateUrl: "static/app/partials/userApp/allForms.html"
     controller: "FormDisplayController",
-      isFree: false
+      isFree: isDeveloper
 
   $routeProvider.otherwise redirectTo: "/sign_in"]
 
