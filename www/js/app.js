@@ -8,32 +8,32 @@
   app.config([
     "$routeProvider", function($routeProvider) {
       $routeProvider.when("/view1", {
-        templateUrl: "static/app/partials/input_fields.html",
+        templateUrl: "templates/input_fields.html",
         controller: "MyCtrl1",
         access: {
           isFree: false
         }
       });
       $routeProvider.when("/sign_in", {
-        templateUrl: "static/app/partials/sign_in.html",
+        templateUrl: "templates/sign_in.html",
         controller: "SignInController"
       }, {
         isFree: true
       });
       $routeProvider.when("/sign_up", {
-        templateUrl: "static/app/partials/sign_up.html",
+        templateUrl: "templates/sign_up.html",
         controller: "SignUpController"
       }, {
         isFree: true
       });
       $routeProvider.when("/form_fill_up", {
-        templateUrl: "static/app/partials/userApp/form_fill_up.html",
+        templateUrl: "templates/form_fill_up.html",
         controller: "FormController"
       }, {
         isFree: false
       });
       $routeProvider.when("/all_forms", {
-        templateUrl: "static/app/partials/userApp/allForms.html",
+        templateUrl: "templates/allForms.html",
         controller: "FormDisplayController"
       }, {
         isFree: false

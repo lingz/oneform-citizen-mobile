@@ -5,39 +5,6 @@
 
   app1 = angular.module("myApp.controllers", []);
 
-  app1.controller("MyCtrl1", [
-    '$scope', '$http', function($scope, $http) {
-      $http.get("/static/forms/form1.json").success(function(form) {
-        return $scope._form = form;
-      });
-      $http.get("/static/forms/user.json").success(function(user) {
-        return $scope.user = user;
-      });
-      $scope.print = function(str) {
-        return console.log(str);
-      };
-      return $scope.update = function(fieldName, answer) {
-        var user;
-        user = $scope.user;
-        return $.ajax({
-          url: location.hostname + "/users/" + user._id,
-          data: {
-            _id: user._id,
-            secret: user.secret,
-            update: ""
-          },
-          type: "POST",
-          success: function(data, textStatus, jqXHR) {
-            return console.log("success done");
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            return console.log('ERROR: ' + errorThrown);
-          }
-        });
-      };
-    }
-  ]);
-
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', function($scope, $http, User, $location) {
       return $scope.signIn = function(user) {
