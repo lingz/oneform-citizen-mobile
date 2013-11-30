@@ -1,0 +1,4 @@
+*.keystore
+*.sw*
+*.swp
+platforms/^.*
