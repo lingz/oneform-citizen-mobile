@@ -14,4 +14,21 @@
     return info;
   });
 
+  srv.factory('formsService', function() {
+    var info;
+    info = {
+      data: null,
+      orderedData: null
+    };
+    return info;
+  });
+
+  srv.factory('fieldsService', function() {
+    var info;
+    info = {
+      data: null
+    };
+    return info;
+  });
+
 }).call(this);

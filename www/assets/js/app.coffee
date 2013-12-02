@@ -21,13 +21,13 @@ app.config ["$routeProvider", ($routeProvider) ->
     controller: "SignUpController",
       isFree: true
 
-  $routeProvider.when "/form_fill_up",
-    templateUrl: "partials/userApp/form_fill_up.html"
+  $routeProvider.when "/form/:_id",
+    templateUrl: "partials/form.html"
     controller: "FormController",
       isFree: isDeveloper
 
   $routeProvider.when "/all_forms",
-    templateUrl: "partials/userApp/allForms.html"
+    templateUrl: "partials/allForms.html"
     controller: "FormDisplayController",
       isFree: isDeveloper
 

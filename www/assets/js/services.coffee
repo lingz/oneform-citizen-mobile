@@ -7,3 +7,15 @@ srv.factory('User', ()->
     authenticated: null
   return info
 )
+srv.factory('formsService', ()->
+  info =
+    data: null
+    orderedData: null
+  return info
+)
+srv.factory('fieldsService', ()->
+  info =
+    data: null
+  return info
+)
+

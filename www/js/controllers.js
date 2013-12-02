@@ -6,7 +6,7 @@
   app1 = angular.module("myApp.controllers", []);
 
   app1.controller("SignInController", [
-    '$scope', '$http', 'User', '$location', function($scope, $http, User, $location) {
+    '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService) {
       return $scope.signIn = function(user) {
         var data, success;
         data = {
@@ -14,6 +14,7 @@
           secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
         };
         success = function(data, status, headers, config) {
+          var successFields, successForms;
           if (data.result != null) {
             console.log(User);
             User.data = data.result;
@@ -21,7 +22,41 @@
             console.log(User.data);
             console.log("Auth:");
             console.log(User.authenticated);
-            return $location.path("/all_forms");
+            $rootScope.$apply();
+            successForms = function(data, status, headers, config) {
+              var form, formData, _i, _len, _ref;
+              if (data.result != null) {
+                console.log(data.result);
+                formsService.orderedData = data.result;
+                formData = {};
+                $rootScope.$apply();
+                $location.path("/all_forms");
+                _ref = data.result;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  form = _ref[_i];
+                  formData[form._id] = form;
+                }
+                return formsService.data = formData;
+              }
+            };
+            make_request("/forms", "GET", null, successForms);
+            successFields = function(data, status, headers, config) {
+              var field, fieldData, _i, _len, _ref;
+              if (data.result != null) {
+                console.log(data.result);
+                fieldData = {};
+                _ref = data.result;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  field = _ref[_i];
+                  fieldData[field._id] = field;
+                }
+                fieldsService.data = fieldData;
+                return $rootScope.$apply();
+              }
+            };
+            return make_request("/fields", "GET", null, successFields);
+          } else {
+            return raise_error_message("Incorrect email & password combination");
           }
         };
         return make_request("/auth/users", "POST", data, success);
@@ -30,7 +65,7 @@
   ]);
 
   app1.controller("SignUpController", [
-    '$scope', '$location', function($scope, $location) {
+    '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
       $scope.userSignUp = {};
       return $scope.signUp = function(user) {
         var data, success;
@@ -46,7 +81,8 @@
             console.log("response: ");
             console.log(data);
             $location.path("/forms");
-            return $location.replace();
+            $location.replace();
+            return $rootScope.$apply();
           };
           return make_request("/users", "POST", data, success);
         } else {
@@ -57,7 +93,19 @@
   ]);
 
   app1.controller("FormController", [
-    function() {
+    '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', function($scope, $routeParams, User, formsService, fieldsService) {
+      var field_id, _i, _len, _ref;
+      $scope._id = $routeParams._id;
+      console.log($scope._id);
+      console.log(formsService);
+      console.log(fieldsService);
+      $scope.fields = [];
+      _ref = formsService.data[$scope._id].fields;
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        field_id = _ref[_i];
+        $scope.fields.push(fieldsService.data[field_id]);
+      }
+      console.log($scope.fields);
       $scope.update = function(fieldName, answer) {
         var data;
         if ($scope.fieldName.$valid && UserService.isLogged === true) {
@@ -88,18 +136,9 @@
   ]);
 
   app1.controller("FormDisplayController", [
-    'User', '$scope', '$http', function(User, $scope, $http) {
-      return $http({
-        method: 'GET',
-        url: window.location.protocol + "//" + window.location.host + "/forms"
-      }).success(function(data, status, headers, config) {
-        if (data.result != null) {
-          console.log(data.result);
-          return $scope.forms = data.result;
-        }
-      }).error(function(data, status, headers, config) {
-        return console.log(data);
-      });
+    '$scope', 'formsService', function($scope, formsService) {
+      console.log(formsService);
+      return $scope.forms = formsService.orderedData;
     }
   ]);
 
