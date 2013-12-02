@@ -5,50 +5,15 @@
 
   app1 = angular.module("myApp.controllers", []);
 
-  app1.controller("MyCtrl1", [
-    '$scope', '$http', function($scope, $http) {
-      $http.get("/static/forms/form1.json").success(function(form) {
-        return $scope._form = form;
-      });
-      $http.get("/static/forms/user.json").success(function(user) {
-        return $scope.user = user;
-      });
-      $scope.print = function(str) {
-        return console.log(str);
-      };
-      return $scope.update = function(fieldName, answer) {
-        var user;
-        user = $scope.user;
-        return $.ajax({
-          url: location.hostname + "/users/" + user._id,
-          data: {
-            _id: user._id,
-            secret: user.secret,
-            update: ""
-          },
-          type: "POST",
-          success: function(data, textStatus, jqXHR) {
-            return console.log("success done");
-          },
-          error: function(jqXHR, textStatus, errorThrown) {
-            return console.log('ERROR: ' + errorThrown);
-          }
-        });
-      };
-    }
-  ]);
-
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', function($scope, $http, User, $location) {
       return $scope.signIn = function(user) {
-        return $http({
-          method: 'POST',
-          data: {
-            email: user.email,
-            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
-          },
-          url: window.location.protocol + "//" + window.location.host + "/auth/users"
-        }).success(function(data, status, headers, config) {
+        var data, success;
+        data = {
+          email: user.email,
+          secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
+        };
+        success = function(data, status, headers, config) {
           if (data.result != null) {
             console.log(User);
             User.data = data.result;
@@ -58,9 +23,8 @@
             console.log(User.authenticated);
             return $location.path("/all_forms");
           }
-        }).error(function(data, status, headers, config) {
-          return console.log(data);
-        });
+        };
+        return make_request("/auth/users", "POST", data, success);
       };
     }
   ]);

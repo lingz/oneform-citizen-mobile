@@ -6,28 +6,28 @@ app = angular.module("myApp", ["ngRoute", "myApp.filters", "myApp.services", "my
 
 app.config ["$routeProvider", ($routeProvider) ->
   $routeProvider.when "/view1",
-    templateUrl: "static/app/partials/input_fields.html"
+    templateUrl: "partials/input_fields.html"
     controller: "MyCtrl1",
     access:
       isFree: isDeveloper
 
   $routeProvider.when "/sign_in",
-    templateUrl: "static/app/partials/sign_in.html"
+    templateUrl: "partials/sign_in.html"
     controller: "SignInController",
       isFree: true
 
   $routeProvider.when "/sign_up",
-    templateUrl: "static/app/partials/sign_up.html"
+    templateUrl: "partials/sign_up.html"
     controller: "SignUpController",
       isFree: true
 
   $routeProvider.when "/form_fill_up",
-    templateUrl: "static/app/partials/userApp/form_fill_up.html"
+    templateUrl: "partials/userApp/form_fill_up.html"
     controller: "FormController",
       isFree: isDeveloper
 
   $routeProvider.when "/all_forms",
-    templateUrl: "static/app/partials/userApp/allForms.html"
+    templateUrl: "partials/userApp/allForms.html"
     controller: "FormDisplayController",
       isFree: isDeveloper
 

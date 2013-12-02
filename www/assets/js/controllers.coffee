@@ -1,37 +1,13 @@
 "use strict"
 app1 = angular.module("myApp.controllers", [])
 
-app1.controller "MyCtrl1", ['$scope', '$http' ,($scope, $http) ->
-    $http.get("/static/forms/form1.json").success (form) ->
-      $scope._form = form
-    $http.get("/static/forms/user.json").success (user) ->
-      $scope.user = user
-    $scope.print = (str) ->
-      console.log(str)
-    $scope.update = (fieldName,answer) ->
-      user = $scope.user
-      $.ajax(
-        url: location.hostname+"/users/"+user._id
-        data:
-          _id: user._id
-          secret: user.secret
-          update: ""
-        type: "POST"
-        success: (data,textStatus,jqXHR) ->
-          console.log("success done")
-        error: (jqXHR, textStatus, errorThrown) ->
-          console.log('ERROR: ' + errorThrown)
-        )]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', ($scope, $http, User,$location) ->
   $scope.signIn = (user) ->
-    $http(
-      method: 'POST'
-      data:
-        email: user.email
-        secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
-      url: window.location.protocol + "//" + window.location.host + "/auth/users"
-    ).success((data, status, headers, config) ->
+    data = 
+      email: user.email
+      secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
+    success = (data, status, headers, config) ->
       if data.result?
         console.log(User)
         User.data = data.result
@@ -40,10 +16,8 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', ($s
         console.log("Auth:")
         console.log(User.authenticated)
         $location.path("/all_forms")
-    ).error((data, status, headers, config) ->
-      console.log(data)
-    )
 
+    make_request("/auth/users", "POST", data, success)
 ]
 
 app1.controller "SignUpController", ['$scope', '$location',($scope, $location) ->

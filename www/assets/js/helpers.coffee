@@ -1,3 +1,5 @@
+window.serverAddress = "http://ec2-54-218-85-114.us-west-2.compute.amazonaws.com"
+
 window.make_request = (route, type, data, success, error) ->
   if type == "POST" or type == "PUT"
     data = JSON.stringify(data)
@@ -6,7 +8,7 @@ window.make_request = (route, type, data, success, error) ->
   if error == null
     error = ()->
   $.ajax(
-    url: window.location.protocol + "//" + window.location.host + route
+    url: serverAddress + route
     contentType: "application/json"
     data: data
     type: type
