@@ -1,6 +1,13 @@
+@import "mixins";
 @import "sidemenu";
+@import "input";
+@import "loading";
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
 
+/* Misc */
+sidemenu {
+  width: 100%;
+}

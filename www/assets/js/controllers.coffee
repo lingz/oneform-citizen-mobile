@@ -12,6 +12,8 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
 app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
   $scope.openLeft = () ->
     $scope.sideMenuController.toggleLeft()
+  $scope.isLoading = false
+  $scope.loadingMessage = ""
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -149,6 +151,9 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
 
 
 app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, formsService) ->
+    $scope.query =
+      name: "Search"
+      _id: "formSearch"
     console.log (formsService)
     $scope.forms = formsService.orderedData
 ]

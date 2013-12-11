@@ -23,10 +23,14 @@
   <script src="js/controllers.js"></script>
   <script src="js/filters.js"></script>
   <script src="js/directives.js"></script>
+  <script src="js/extra.js"></script>
 </head>
 <body ng-controller="menuController">
   <side-menus>
     <pane side-menu-content>
+      <div id="loading" ng-class="{'isLoading': isLoading}">
+        {{loadingMessage.length > 0 ? loadingMessage : "Loading..." }}
+      </div>
       <header class="bar bar-header bar-dark">
         <button class="button button-icon" ng-click="openLeft()">
           <i class="icon ion-navicon"></i>

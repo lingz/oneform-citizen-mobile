@@ -1,8 +1,10 @@
 <p>allForms</p>
-Search: <input ng-model="query">
+<input-form>
+  <input-field field="query"></input-field>
+</input-form>
 
 <ul decorations:"none">
-	<li ng-repeat="form in forms | filter:query" style="list-style-type: none">
+	<li ng-repeat="form in forms | filter:query.value" style="list-style-type: none">
 		<a href="#/form/{{form._id}}">{{form.name}}</a>
 		<p></p>
 	</li>

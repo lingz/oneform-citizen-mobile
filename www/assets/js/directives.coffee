@@ -15,11 +15,30 @@ app1.directive "checkUser", ["$rootScope", "$location", "userSrv", ($root, $loca
   link: (scope, elem, attrs, ctrl) ->
     $root.$on "$routeChangeStart", (event, currRoute, prevRoute) ->
       $location.path("/view1") if not prevRoute.access.isFree and not userSrv.isLogged
-
 ]
 
 app1.directive "sidemenu", ->
   return {
     restrict: "E",
     templateUrl: "partials/sidemenu.html"
+  }
+
+app1.directive "inputForm", ->
+  return {
+    restrict: "E",
+    transclude: true,
+    templateUrl: "partials/input-form.html"
+  }
+
+app1.directive "inputField", ->
+  return {
+    restrict: "E",
+    templateUrl: "partials/input-field.html",
+    scope: {
+      fieldInfo: "=field",
+      keyup: "&"
+    }
+    link: (scope, element, attrs) ->
+      scope.keyup = ($event) ->
+        scope.fieldInfo.value = element.find("input").val()
   }

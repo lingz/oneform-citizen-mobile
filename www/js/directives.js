@@ -42,4 +42,28 @@
     };
   });
 
+  app1.directive("inputForm", function() {
+    return {
+      restrict: "E",
+      transclude: true,
+      templateUrl: "partials/input-form.html"
+    };
+  });
+
+  app1.directive("inputField", function() {
+    return {
+      restrict: "E",
+      templateUrl: "partials/input-field.html",
+      scope: {
+        fieldInfo: "=field",
+        keyup: "&"
+      },
+      link: function(scope, element, attrs) {
+        return scope.keyup = function($event) {
+          return scope.fieldInfo.value = element.find("input").val();
+        };
+      }
+    };
+  });
+
 }).call(this);
