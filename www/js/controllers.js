@@ -5,23 +5,43 @@
 
   app1 = angular.module("myApp.controllers", []);
 
+  app1.controller("LogoutController", [
+    '$scope', '$location', 'localStorageService', 'UserService', function($scope, $location, localStorageService, UserService) {
+      console.log("logging out");
+      localStorageService.clearAll();
+      User.authenticated = false;
+      return $location.path("/sign_in");
+    }
+  ]);
+
   app1.controller("SignInController", [
-    '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService) {
-      return $scope.signIn = function(user) {
+    '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', 'localStorageService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) {
+      var local;
+      $scope.signIn = function(user, email, secret) {
         var data, success;
-        data = {
-          email: user.email,
-          secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
-        };
+        console.log(email);
+        console.log(secret);
+        console.log("authenticating3");
+        if ((email != null) && (secret != null)) {
+          console.log("authenticating2");
+          data = {
+            email: email,
+            secret: secret
+          };
+        } else {
+          data = {
+            email: user.email,
+            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
+          };
+          localStorageService.add('email', data["email"]);
+          localStorageService.add('secret', data["secret"]);
+        }
         success = function(data, status, headers, config) {
           var successFields, successForms;
           if (data.result != null) {
             console.log(User);
             User.data = data.result;
             User.authenticated = true;
-            console.log(User.data);
-            console.log("Auth:");
-            console.log(User.authenticated);
             $rootScope.$apply();
             successForms = function(data, status, headers, config) {
               var form, formData, _i, _len, _ref;
@@ -61,6 +81,15 @@
         };
         return make_request("/auth/users", "POST", data, success);
       };
+      console.log('localStorageService');
+      local = {};
+      local['email'] = localStorageService.get('email');
+      local['secret'] = localStorageService.get('secret');
+      console.log(local);
+      if (local) {
+        console.log("authenticating1");
+        return $scope.signIn("", local['email'], local['secret']);
+      }
     }
   ]);
 
@@ -94,8 +123,9 @@
 
   app1.controller("FormController", [
     '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', function($scope, $routeParams, User, formsService, fieldsService) {
-      var field_id, _i, _len, _ref;
+      var data, field_id, success, _i, _len, _ref;
       $scope._id = $routeParams._id;
+      console.log("scope._id, formsService, fieldsService");
       console.log($scope._id);
       console.log(formsService);
       console.log(fieldsService);
@@ -117,21 +147,10 @@
           return make_request("/users/:id", POST, data, success);
         }
       };
-      return $scope.post_form = function(_form_answers) {
-        var data, success;
-        if ($scope._form_name.$valid) {
-          console.log($scope._form_answers);
-          data = $scope._form_answers;
-          console.log(data);
-          success = function() {
-            console.log("response: ");
-            return console.log(data);
-          };
-          return make_request("/users/:id/forms", "POST", data, success);
-        } else {
-          return raise_error_message("Required fields missingcd r");
-        }
-      };
+      return $scope.post_form = _form_answers - ($scope._form_name.$valid ? (console.log($scope._form_answers), data = $scope._form_answers, console.log(data), success = function() {
+        console.log("response: ");
+        return console.log(data);
+      }, make_request("/users/:id/forms", "POST", data, success)) : raise_error_message("Required fields missingcd r"));
     }
   ]);
 
@@ -139,6 +158,13 @@
     '$scope', 'formsService', function($scope, formsService) {
       console.log(formsService);
       return $scope.forms = formsService.orderedData;
+    }
+  ]);
+
+  app1.controller("MyDataController", [
+    '$scope', 'User', function($scope, User) {
+      console.log(User);
+      return $scope.mydata = User.data;
     }
   ]);
 

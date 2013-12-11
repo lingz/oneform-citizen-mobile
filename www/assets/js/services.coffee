@@ -18,4 +18,3 @@ srv.factory('fieldsService', ()->
     data: null
   return info
 )
-

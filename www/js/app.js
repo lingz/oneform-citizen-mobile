@@ -5,7 +5,7 @@
 
   isDeveloper = true;
 
-  app = angular.module("myApp", ["ngRoute", "myApp.filters", "myApp.services", "myApp.controllers"]);
+  app = angular.module("myApp", ["ngRoute", "LocalStorageModule", "myApp.filters", "myApp.services", "myApp.controllers"]);
 
   app.config([
     "$routeProvider", function($routeProvider) {
@@ -39,6 +39,18 @@
         controller: "FormDisplayController"
       }, {
         isFree: isDeveloper
+      });
+      $routeProvider.when("/mydata", {
+        templateUrl: "partials/mydata.html",
+        controller: "MyDataController"
+      }, {
+        isFree: isDeveloper
+      });
+      $routeProvider.when("/logout", {
+        templateUrl: "partials/sign_in.html",
+        controller: "LogoutController"
+      }, {
+        isFree: true
       });
       return $routeProvider.otherwise({
         redirectTo: "/sign_in"

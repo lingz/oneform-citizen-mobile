@@ -2,7 +2,7 @@
 isDeveloper = true
 
 # Declare app level module which depends on filters, and services
-app = angular.module("myApp", ["ngRoute", "myApp.filters", "myApp.services", "myApp.controllers"])
+app = angular.module("myApp", ["ngRoute", "LocalStorageModule", "myApp.filters", "myApp.services", "myApp.controllers"])
 
 app.config ["$routeProvider", ($routeProvider) ->
   $routeProvider.when "/view1",
@@ -30,6 +30,16 @@ app.config ["$routeProvider", ($routeProvider) ->
     templateUrl: "partials/allForms.html"
     controller: "FormDisplayController",
       isFree: isDeveloper
+
+  $routeProvider.when "/mydata",
+    templateUrl: "partials/mydata.html"
+    controller: "MyDataController",
+      isFree: isDeveloper
+
+  $routeProvider.when "/logout",
+    templateUrl: "partials/sign_in.html"
+    controller: "LogoutController",
+      isFree: true
 
   $routeProvider.otherwise redirectTo: "/sign_in"]
 
