@@ -32,7 +32,7 @@
       {{loadingMessage.length > 0 ? loadingMessage : "Loading..." }}
     </div>
   </div>
-  <side-menus>
+  <side-menus ng-show="appLoaded">
     <pane side-menu-content>
       <header class="bar bar-header">
         <button class="button button-icon" ng-click="toggleLeft()">

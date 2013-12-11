@@ -10,16 +10,26 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
 ]
 
 app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+  $scope.appLoaded = false
   $scope.closeLeft = () ->
     $scope.sideMenuController.close()
   $scope.toggleLeft = () ->
     $scope.sideMenuController.toggleLeft()
-  $scope.isLoading = false
-  $scope.loadingMessage = ""
+  $scope.isLoading = true
+  $scope.loadingMessage = "oneForm"
   $scope.$on("$routeChangeSuccess", () ->
     console.log("running")
     $scope.closeLeft()
   )
+  $rootScope.startLoad = (loadingMessage) ->
+    $scope.isLoading = true
+    $scope.loadingMessage = if loadingMessage then loadingMessage else "Loading..."
+
+  $rootScope.stopLoad = () ->
+    $scope.isLoading = false
+
+  $rootScope.appReady = () ->
+    $scope.appLoaded = true
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -35,6 +45,7 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
       name: "Password"
       _id: "userPassword"
       value: ""
+
   $scope.signIn = (user, email, secret) ->
     console.log (email)
     console.log (secret)
@@ -52,6 +63,8 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
       localStorageService.add('email',data["email"])
       localStorageService.add('secret',data["secret"])
 
+    loadMessage = if $scope.loadingMessage then $scope.loadingMessage else "Loading..."
+    $rootScope.startLoad(loadMessage)
     success = (data, status, headers, config) ->
       if data.result?
         console.log ("user")
@@ -61,14 +74,16 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
         User.data = data.result
         User.data['secret'] = secret
         User.authenticated = true
-        $rootScope.$apply()
         successForms = (data, status, headers, config) ->
           if data.result?
             console.log(data.result)
             formsService.orderedData = data.result
             formData = {}
-            $rootScope.$apply()
-            $location.path("/all_forms")
+            $rootScope.$apply(() ->
+              $scope.appReady()
+              $location.path("/all_forms")
+              $rootScope.stopLoad()
+            )
             for form in data.result
               formData[form._id] = form
             formsService.data = formData
@@ -87,7 +102,6 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
 
     make_request("/auth/users", "POST", data, success)
 
-  console.log ('localStorageService')
   local = {}
   local['email'] = localStorageService.get('email')
   local['secret'] = localStorageService.get('secret')
@@ -96,6 +110,8 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
   if local.email? and local.secret?
     console.log ("authenticating1")
     $scope.signIn("", local['email'], local['secret'])
+  else
+    $rootScope.appReady()
 ]
 
 app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->

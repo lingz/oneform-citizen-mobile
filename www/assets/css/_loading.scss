@@ -19,11 +19,9 @@ $search-dark-blue: rgb(184,185,205);
   @include vendor-prefix(transition, "opacity 0.5s");
   &.isLoading {
     opacity: 1;
-    visibility: visible;
   }
   &.notLoading {
     opacity: 0;
-    visibility: visible;
   }
   img {
     margin-top: 30px

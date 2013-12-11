@@ -7,6 +7,7 @@
 
   app1.controller("LogoutController", [
     '$scope', '$location', 'localStorageService', 'User', function($scope, $location, localStorageService, User) {
+      console.log("logging out");
       localStorageService.clearAll();
       User.authenticated = false;
       return $location.path("/sign_in");
@@ -15,6 +16,7 @@
 
   app1.controller("menuController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+      $scope.appLoaded = false;
       $scope.closeLeft = function() {
         return $scope.sideMenuController.close();
       };
@@ -23,10 +25,20 @@
       };
       $scope.isLoading = true;
       $scope.loadingMessage = "oneForm";
-      return $scope.$on("$routeChangeSuccess", function() {
+      $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
         return $scope.closeLeft();
       });
+      $rootScope.startLoad = function(loadingMessage) {
+        $scope.isLoading = true;
+        return $scope.loadingMessage = loadingMessage ? loadingMessage : "Loading...";
+      };
+      $rootScope.stopLoad = function() {
+        return $scope.isLoading = false;
+      };
+      return $rootScope.appReady = function() {
+        return $scope.appLoaded = true;
+      };
     }
   ]);
 
@@ -46,7 +58,7 @@
         }
       };
       $scope.signIn = function(user, email, secret) {
-        var data, success;
+        var data, loadMessage, success;
         console.log(email);
         console.log(secret);
         console.log(user);
@@ -65,6 +77,8 @@
           localStorageService.add('email', data["email"]);
           localStorageService.add('secret', data["secret"]);
         }
+        loadMessage = $scope.loadingMessage ? $scope.loadingMessage : "Loading...";
+        $rootScope.startLoad(loadMessage);
         success = function(data, status, headers, config) {
           var successFields, successForms;
           if (data.result != null) {
@@ -75,15 +89,17 @@
             User.data = data.result;
             User.data['secret'] = secret;
             User.authenticated = true;
-            $rootScope.$apply();
             successForms = function(data, status, headers, config) {
               var form, formData, _i, _len, _ref;
               if (data.result != null) {
                 console.log(data.result);
                 formsService.orderedData = data.result;
                 formData = {};
-                $rootScope.$apply();
-                $location.path("/all_forms");
+                $rootScope.$apply(function() {
+                  $scope.appReady();
+                  $location.path("/all_forms");
+                  return $rootScope.stopLoad();
+                });
                 _ref = data.result;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   form = _ref[_i];
@@ -114,7 +130,6 @@
         };
         return make_request("/auth/users", "POST", data, success);
       };
-      console.log('localStorageService');
       local = {};
       local['email'] = localStorageService.get('email');
       local['secret'] = localStorageService.get('secret');
@@ -122,6 +137,8 @@
       if ((local.email != null) && (local.secret != null)) {
         console.log("authenticating1");
         return $scope.signIn("", local['email'], local['secret']);
+      } else {
+        return $rootScope.appReady();
       }
     }
   ]);
@@ -143,7 +160,7 @@
           id: "email"
         },
         uniqueId: {
-          name: "UDID (Emirates Id)",
+          name: "UDID (Emirates Id Number)",
           id: "internalId"
         },
         password: {
