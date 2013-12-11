@@ -99,6 +99,13 @@ input-field input{
   }
 }
 
+a {
+  text-decoration: none;
+  &:hover {
+    text-decoration: none;
+  }
+}
+
 .light-text {
   font-weight: 100;
 }

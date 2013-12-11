@@ -197,6 +197,11 @@ input-field input {
     vertical-align: middle;
     line-height: 22px; }
 
+a {
+  text-decoration: none; }
+  a:hover {
+    text-decoration: none; }
+
 .light-text {
   font-weight: 100; }
 
