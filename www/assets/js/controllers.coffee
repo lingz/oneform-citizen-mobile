@@ -1,6 +1,7 @@
 "use strict"
 app1 = angular.module("myApp.controllers", [])
 
+
 app1.controller "LogoutController", ['$scope', '$location', 'localStorageService', 'UserService', ($scope, $location, localStorageService, UserService) ->
   console.log("logging out")
   localStorageService.clearAll()
@@ -8,6 +9,10 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
   $location.path("/sign_in")
 ]
 
+app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+  $scope.openLeft = () ->
+    $scope.sideMenuController.toggleLeft()
+]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
  'formsService', 'fieldsService','localStorageService', \
@@ -112,7 +117,7 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
         secret: UserService.secret
       make_request("/users/:id", POST, data, success)
 
-  $scope.post_form = (_form_answers) -
+  $scope.post_form = (_form_answers) ->
     if $scope._form_name.$valid
       console.log $scope._form_answers
       data = $scope._form_answers
@@ -133,7 +138,9 @@ app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, for
     $scope.forms = formsService.orderedData
 ]
 
+
 app1.controller "MyDataController", ['$scope', 'User', ($scope, User) ->
     console.log (User)
     $scope.mydata = User.data
 ]
+

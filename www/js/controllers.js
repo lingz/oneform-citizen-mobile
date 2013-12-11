@@ -14,6 +14,14 @@
     }
   ]);
 
+  app1.controller("menuController", [
+    '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+      return $scope.openLeft = function() {
+        return $scope.sideMenuController.toggleLeft();
+      };
+    }
+  ]);
+
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', 'localStorageService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) {
       var local;
@@ -123,7 +131,7 @@
 
   app1.controller("FormController", [
     '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', function($scope, $routeParams, User, formsService, fieldsService) {
-      var data, field_id, success, _i, _len, _ref;
+      var field_id, _i, _len, _ref;
       $scope._id = $routeParams._id;
       console.log("scope._id, formsService, fieldsService");
       console.log($scope._id);
@@ -147,10 +155,21 @@
           return make_request("/users/:id", POST, data, success);
         }
       };
-      return $scope.post_form = _form_answers - ($scope._form_name.$valid ? (console.log($scope._form_answers), data = $scope._form_answers, console.log(data), success = function() {
-        console.log("response: ");
-        return console.log(data);
-      }, make_request("/users/:id/forms", "POST", data, success)) : raise_error_message("Required fields missingcd r"));
+      return $scope.post_form = function(_form_answers) {
+        var data, success;
+        if ($scope._form_name.$valid) {
+          console.log($scope._form_answers);
+          data = $scope._form_answers;
+          console.log(data);
+          success = function() {
+            console.log("response: ");
+            return console.log(data);
+          };
+          return make_request("/users/:id/forms", "POST", data, success);
+        } else {
+          return raise_error_message("Required fields missingcd r");
+        }
+      };
     }
   ]);
 

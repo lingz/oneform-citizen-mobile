@@ -2,7 +2,10 @@
 isDeveloper = true
 
 # Declare app level module which depends on filters, and services
-app = angular.module("myApp", ["ngRoute", "LocalStorageModule", "myApp.filters", "myApp.services", "myApp.controllers"])
+
+
+app = angular.module("myApp", ["ionic", "myApp.filters", "myApp.services",
+  "myApp.controllers", "myApp.directives", "ngRoute", "LocalStorageModule"])
 
 app.config ["$routeProvider", ($routeProvider) ->
   $routeProvider.when "/view1",
@@ -47,6 +50,6 @@ app.run ($rootScope, $location, User) ->
   $rootScope.$watch(
     => $location.path(),
     (next, prev) ->
-        if not User.authenticated and not (next is '/sign_in' or next is '/sign_up')
-          $location.path("/sign_in")
+      if not User.authenticated and not (next is '/sign_in' or next is '/sign_up')
+        $location.path("/sign_in")
   )
