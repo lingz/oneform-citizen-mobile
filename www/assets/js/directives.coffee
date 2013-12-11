@@ -35,7 +35,10 @@ app1.directive "inputField", ->
     restrict: "E",
     templateUrl: "partials/input-field.html",
     scope: {
-      fieldInfo: "=field"
+      fieldInfo: "=field",
+      keyup: "&"
     }
-
+    link: (scope, element, attrs) ->
+      scope.keyup = ($event) ->
+        scope.fieldInfo.value = element.find("input").val()
   }

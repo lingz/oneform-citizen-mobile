@@ -55,7 +55,13 @@
       restrict: "E",
       templateUrl: "partials/input-field.html",
       scope: {
-        fieldInfo: "=field"
+        fieldInfo: "=field",
+        keyup: "&"
+      },
+      link: function(scope, element, attrs) {
+        return scope.keyup = function($event) {
+          return scope.fieldInfo.value = element.find("input").val();
+        };
       }
     };
   });
