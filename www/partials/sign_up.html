@@ -1,17 +1,12 @@
-<div>
+<div id="sign-up">
 	<form name="signUpForm" ng-controller="SignUpController" method="POST" novalidate ng-submit="signUp(user)">
-		<h2>first name*</h2>
-		<input type="text" ng-model="user.firstName" required>
-		<h2>last name*</h2>
-		<input type="text" ng-model="user.lastName" required>
-		<h2>id*</h2>
-		<input type="text" ng-model="user.internalId" required>
-		<h2>e-mail*</h2>
-		<input type="text" ng-model="user.email" required>
-		<h2>unique ID</h2>
-		<input type="text" ng-model="user.uniqueId" required>
-		<h2>password*</h2>
-		<input ng-model="user.password" type="password" required>
-		<button type="submit">Sign Up</button>
+    <ol>
+      <input-field field="user.firstName"></input-field>
+      <input-field field="user.lastName"></input-field>
+      <input-field field="user.email"></input-field>
+      <input-field field="user.uniqueId"></input-field>
+      <input-field field="user.password"></input-field>
+    </ol>
+		<input type="submit" value="Sign Up" class="medium-text">
 	</form>
 </div>

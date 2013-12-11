@@ -26,7 +26,11 @@
   };
 
   window.raise_error_message = function(error_str) {
-    return $('#errors').html(error_str);
+    $("#error-content").html(error_str);
+    $('#errors').addClass("raised");
+    return setTimeout(function() {
+      return $("#errors").removeClass("raised");
+    }, 3000);
   };
 
 }).call(this);

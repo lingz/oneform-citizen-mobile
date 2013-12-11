@@ -31,17 +31,18 @@
       <div id="loading" ng-class="{'isLoading': isLoading}">
         {{loadingMessage.length > 0 ? loadingMessage : "Loading..." }}
       </div>
-      <header class="bar bar-header bar-dark">
-        <button class="button button-icon" ng-click="openLeft()">
+      <header class="bar bar-header">
+        <button class="button button-icon" ng-click="toggleLeft()">
           <i class="icon ion-navicon"></i>
         </button>
-        <h1 class="title">oneForm</h1>
+        <a href="#/all_forms" class="title"><span class="light-text">one</span><span class="heavy-text">Form</span></a>
       </header>
       <content has-header="true">
         <div ng-view></div>
-        <div id="errors">
-        </div>
       </content>
+      <div id="errors">
+        <span id="error-content"></span>
+      </div>
     </pane>
     <side-menu side="left">
     <sidemenu></sidemenu>

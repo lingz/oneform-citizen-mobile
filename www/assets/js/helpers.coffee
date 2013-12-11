@@ -20,4 +20,8 @@ window.make_request = (route, type, data, success, error) ->
       )
 
 window.raise_error_message = (error_str) ->
- $('#errors').html(error_str)
+  $("#error-content").html(error_str)
+  $('#errors').addClass("raised")
+  setTimeout(() ->
+    $("#errors").removeClass("raised")
+  , 3000)

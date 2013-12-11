@@ -59,9 +59,12 @@
         keyup: "&"
       },
       link: function(scope, element, attrs) {
-        return scope.keyup = function($event) {
+        scope.keyup = function($event) {
           return scope.fieldInfo.value = element.find("input").val();
         };
+        console.log("attrs");
+        console.log(attrs);
+        return scope.htmltype = attrs.htmltype;
       }
     };
   });

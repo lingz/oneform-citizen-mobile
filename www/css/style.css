@@ -1,3 +1,4 @@
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,100);
 .menu-left {
   display: flex; }
 
@@ -14,24 +15,28 @@ form > ol > input-field > li {
   position: relative;
   margin: 1.2em; }
 
-input {
+input, input[type="text"], input[type="password"] {
   padding: 0.1em 0em;
   border: none;
   border-radius: 0px;
-  border-bottom: 1px solid #555;
+  border-bottom: 2px solid #b8b9cd;
   outline: none;
   margin: 0px;
-  background: none; }
+  background: none;
+  margin-bottom: 20px;
+  color: #180853;
+  font-weight: 300;
+  display: inline; }
 
 /**** HERE THE MAGIC STARTS *****/
 /* Original label position: top left and small */
 label {
   position: absolute;
-  top: -1em;
+  top: -1.5em;
   left: 0.08em;
-  color: #aaaaaa;
+  color: #95979a;
   z-index: -1;
-  font-size: 0.85em;
+  font-size: 1.2em;
   animation: float-labels 300ms none ease-out;
   -webkit-animation: float-labels 300ms none ease-out;
   /* There is a bug sometimes pausing the animation. This avoids that.*/
@@ -40,7 +45,7 @@ label {
 
 /* Label highlight effect also for non-JS browsers */
 input:not(.empty):focus + label {
-  color: #0099ff; }
+  color: #180853; }
 
 /* In JS Browsers the .empty class is assigned to empty inputs -> label is rendered like a placeholder in the input field */
 input.empty + label {
@@ -53,7 +58,7 @@ input.empty + label {
 @keyframes float-labels {
   0% {
     opacity: 1;
-    color: #aaa;
+    color: #95979a;
     top: 0.1em;
     font-size: 1.5em; }
 
@@ -66,16 +71,16 @@ input.empty + label {
 
   50% {
     opacity: 0;
-    font-size: 0.85em; }
+    font-size: 1.2em; }
 
   100% {
-    top: -1em;
+    top: -1.5em;
     opacity: 1; } }
 
 @-webkit-keyframes float-labels {
   0% {
     opacity: 1;
-    color: #aaa;
+    color: #95979a;
     top: 0.1em;
     font-size: 1.5em; }
 
@@ -88,10 +93,10 @@ input.empty + label {
 
   50% {
     opacity: 0;
-    font-size: 0.85em; }
+    font-size: 1.2em; }
 
   100% {
-    top: -1em;
+    top: -1.5em;
     opacity: 1; } }
 
 #loading {
@@ -116,9 +121,94 @@ input.empty + label {
     opacity: 1;
     visibility: visible; }
 
+#login, #sign-up {
+  text-align: center;
+  padding-top: 30px; }
+  #login input[type="submit"], #sign-up input[type="submit"] {
+    font-size: 3em;
+    border: none;
+    color: #180853; }
+  #login a, #sign-up a {
+    margin-top: 20px;
+    font-size: 1.2em;
+    display: block;
+    text-decoration: none;
+    color: #180853; }
+    #login a:hover, #sign-up a:hover {
+      text-decoration: none;
+      color: #180853; }
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important; }
 
 /* Misc */
+html, body, h1, h2, h3, h4, h5, h6, input {
+  font-family: 'Roboto', sans-serif !important; }
+
+.big-logo {
+  position: relative;
+  width: 200px;
+  margin-bottom: 30px; }
+
 sidemenu {
   width: 100%; }
+
+header.bar.bar-header {
+  background-color: white !important;
+  border: none !important; }
+  header.bar.bar-header a.title {
+    font-size: 2em;
+    color: #180853; }
+  header.bar.bar-header .ion-navicon {
+    color: black;
+    font-size: 4em; }
+
+a, input[type="submit"] {
+  opacity: 0.8;
+  -webkit-transition: opacity 1s;
+  -ms-transition: opacity 1s;
+  -moz-transition: opacity 1s;
+  -o-transition: opacity 1s;
+  transition: opacity 1s; }
+  a:hover, input[type="submit"]:hover {
+    opacity: 1; }
+
+.item {
+  border: none; }
+
+#errors {
+  background: #60648f;
+  color: white;
+  font-size: 1.5em;
+  width: 100%;
+  font-weight: 300;
+  text-align: center;
+  position: absolute;
+  height: 80px;
+  line-height: 80px;
+  bottom: -80px;
+  -webkit-transition: bottom 0.5s;
+  -ms-transition: bottom 0.5s;
+  -moz-transition: bottom 0.5s;
+  -o-transition: bottom 0.5s;
+  transition: bottom 0.5s; }
+  #errors.raised {
+    bottom: 0px; }
+  #errors span {
+    display: inline-block;
+    vertical-align: middle;
+    line-height: 22px; }
+
+a {
+  text-decoration: none; }
+  a:hover {
+    text-decoration: none; }
+
+.light-text {
+  font-weight: 100; }
+
+.medium-text {
+  font-weight: 300; }
+
+.heavy-text {
+  font-weight: 400; }

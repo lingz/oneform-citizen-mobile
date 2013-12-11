@@ -16,21 +16,41 @@
 
   app1.controller("menuController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
-      $scope.openLeft = function() {
+      $scope.closeLeft = function() {
+        return $scope.sideMenuController.close();
+      };
+      $scope.toggleLeft = function() {
         return $scope.sideMenuController.toggleLeft();
       };
       $scope.isLoading = false;
-      return $scope.loadingMessage = "";
+      $scope.loadingMessage = "";
+      return $scope.$on("$routeChangeSuccess", function() {
+        console.log("running");
+        return $scope.closeLeft();
+      });
     }
   ]);
 
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', 'localStorageService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) {
       var local;
+      $scope.user = {
+        email: {
+          name: "Email",
+          _id: "userEmail",
+          value: ""
+        },
+        secret: {
+          name: "Password",
+          _id: "userPassword",
+          value: ""
+        }
+      };
       $scope.signIn = function(user, email, secret) {
         var data, success;
         console.log(email);
         console.log(secret);
+        console.log(user);
         console.log("authenticating3");
         if ((email != null) && (secret != null)) {
           console.log("authenticating2");
@@ -40,8 +60,8 @@
           };
         } else {
           data = {
-            email: user.email,
-            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
+            email: user.email.value,
+            secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
           };
           localStorageService.add('email', data["email"]);
           localStorageService.add('secret', data["secret"]);
@@ -100,7 +120,7 @@
       local['email'] = localStorageService.get('email');
       local['secret'] = localStorageService.get('secret');
       console.log(local);
-      if (local) {
+      if ((local.email != null) && (local.secret != null)) {
         console.log("authenticating1");
         return $scope.signIn("", local['email'], local['secret']);
       }
@@ -110,6 +130,28 @@
   app1.controller("SignUpController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
       $scope.userSignUp = {};
+      $scope.user = {
+        firstName: {
+          name: "First Name",
+          id: "firstName"
+        },
+        lastName: {
+          name: "Last Name",
+          id: "lastName"
+        },
+        email: {
+          name: "Email",
+          id: "email"
+        },
+        uniqueId: {
+          name: "UDID (Emirates Id Number)",
+          id: "internalId"
+        },
+        password: {
+          name: "Password",
+          id: "password"
+        }
+      };
       return $scope.signUp = function(user) {
         var data, success;
         console.log($scope.signUpForm.$valid);
