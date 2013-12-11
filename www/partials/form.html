@@ -2,8 +2,8 @@
 	<form novalidate class="simple-form">
 		<div ng-repeat="field in fields">
 			<br/>
-				<label for="{{field._id}}">{{field.name}}</label>
 				<input type="{{field.htmlType}}" id="{{field._id}}"></input>
+				<label for="{{field._id}}" size="40">{{field.name}}</label>
 				{{field.description}}
 			<br/>
 		</div>

@@ -1,0 +1,19 @@
+@import "mixins";
+
+#loading {
+  color: white;
+  position: absolute;
+  width: 100%;
+  @include calc(height, "100% - 43px");
+  top: 43px;
+  background: rgba(0,0,0,0.5);
+  opacity: 0;
+  z-index: 10;
+  visibility: hidden;
+  @include vendor-prefix(transition, "opacity 1s");
+  &.isLoading {
+    opacity: 1;
+    visibility: visible;
+  }
+}
+

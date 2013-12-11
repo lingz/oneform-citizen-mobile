@@ -42,4 +42,22 @@
     };
   });
 
+  app1.directive("inputForm", function() {
+    return {
+      restrict: "E",
+      transclude: true,
+      templateUrl: "partials/input-form.html"
+    };
+  });
+
+  app1.directive("inputField", function() {
+    return {
+      restrict: "E",
+      templateUrl: "partials/input-field.html",
+      scope: {
+        fieldInfo: "=field"
+      }
+    };
+  });
+
 }).call(this);

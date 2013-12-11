@@ -6,7 +6,7 @@
   app1 = angular.module("myApp.controllers", []);
 
   app1.controller("LogoutController", [
-    '$scope', '$location', 'localStorageService', 'UserService', function($scope, $location, localStorageService, UserService) {
+    '$scope', '$location', 'localStorageService', 'User', function($scope, $location, localStorageService, User) {
       console.log("logging out");
       localStorageService.clearAll();
       User.authenticated = false;
@@ -16,9 +16,11 @@
 
   app1.controller("menuController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
-      return $scope.openLeft = function() {
+      $scope.openLeft = function() {
         return $scope.sideMenuController.toggleLeft();
       };
+      $scope.isLoading = false;
+      return $scope.loadingMessage = "";
     }
   ]);
 
@@ -175,6 +177,10 @@
 
   app1.controller("FormDisplayController", [
     '$scope', 'formsService', function($scope, formsService) {
+      $scope.query = {
+        name: "Search",
+        _id: "formSearch"
+      };
       console.log(formsService);
       return $scope.forms = formsService.orderedData;
     }

@@ -1,0 +1,9 @@
+<li>
+  <input id="{{fieldInfo._id}}" ng-model="fieldInfo.value" ng-class="{'empty': fieldInfo.value == '' || !fieldInfo.value}" value=''>
+  <label for="{{fieldInfo._id}}">{{fieldInfo.name}}</label>
+  Value:
+  {{fieldInfo.value}}
+  Is here
+  {{!fieldInfo.value}}
+  {{fieldInfo.description}}
+</li>
