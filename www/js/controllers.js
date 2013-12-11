@@ -7,7 +7,6 @@
 
   app1.controller("LogoutController", [
     '$scope', '$location', 'localStorageService', 'User', function($scope, $location, localStorageService, User) {
-      console.log("logging out");
       localStorageService.clearAll();
       User.authenticated = false;
       return $location.path("/sign_in");
@@ -144,7 +143,7 @@
           id: "email"
         },
         uniqueId: {
-          name: "UDID (Emirates Id Number)",
+          name: "UDID (Emirates Id)",
           id: "internalId"
         },
         password: {
