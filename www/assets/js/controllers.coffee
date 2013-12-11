@@ -20,6 +20,11 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
     console.log("running")
     $scope.closeLeft()
   )
+  $rootScope.startLoad = () ->
+    $scope.isLoading = true
+  $rootScope.stopLoad = () ->
+    $scope.isLoading = false
+
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -52,6 +57,7 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
       localStorageService.add('email',data["email"])
       localStorageService.add('secret',data["secret"])
 
+    $rootScope.startLoad()
     success = (data, status, headers, config) ->
       if data.result?
         console.log ("user")
@@ -61,14 +67,15 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
         User.data = data.result
         User.data['secret'] = secret
         User.authenticated = true
-        $rootScope.$apply()
         successForms = (data, status, headers, config) ->
           if data.result?
             console.log(data.result)
             formsService.orderedData = data.result
             formData = {}
-            $rootScope.$apply()
-            $location.path("/all_forms")
+            $rootScope.$apply(() ->
+              $location.path("/all_forms")
+              $rootScope.stopLoad()
+            )
             for form in data.result
               formData[form._id] = form
             formsService.data = formData

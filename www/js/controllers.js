@@ -24,10 +24,16 @@
       };
       $scope.isLoading = false;
       $scope.loadingMessage = "";
-      return $scope.$on("$routeChangeSuccess", function() {
+      $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
         return $scope.closeLeft();
       });
+      $rootScope.startLoad = function() {
+        return $scope.isLoading = true;
+      };
+      return $rootScope.stopLoad = function() {
+        return $scope.isLoading = false;
+      };
     }
   ]);
 
@@ -66,6 +72,7 @@
           localStorageService.add('email', data["email"]);
           localStorageService.add('secret', data["secret"]);
         }
+        $rootScope.startLoad();
         success = function(data, status, headers, config) {
           var successFields, successForms;
           if (data.result != null) {
@@ -76,15 +83,16 @@
             User.data = data.result;
             User.data['secret'] = secret;
             User.authenticated = true;
-            $rootScope.$apply();
             successForms = function(data, status, headers, config) {
               var form, formData, _i, _len, _ref;
               if (data.result != null) {
                 console.log(data.result);
                 formsService.orderedData = data.result;
                 formData = {};
-                $rootScope.$apply();
-                $location.path("/all_forms");
+                $rootScope.$apply(function() {
+                  $location.path("/all_forms");
+                  return $rootScope.stopLoad();
+                });
                 _ref = data.result;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   form = _ref[_i];
