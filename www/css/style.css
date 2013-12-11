@@ -104,13 +104,9 @@ input.empty + label {
   color: #180853;
   position: absolute;
   width: 100%;
-  height: -moz-calc(100% - 43px);
-  height: -o-calc(100% - 43px);
-  height: -webkit-calc(100% - 43px);
-  height: calc(100% - 43px);
-  top: 43px;
+  height: 100%;
+  padding-top: 43px;
   background: white;
-  opacity: 0;
   z-index: 10;
   pointer-events: none;
   -webkit-transition: opacity 0.5s;
@@ -120,6 +116,9 @@ input.empty + label {
   transition: opacity 0.5s; }
   #loading.isLoading {
     opacity: 1;
+    visibility: visible; }
+  #loading.notLoading {
+    opacity: 0;
     visibility: visible; }
   #loading img {
     margin-top: 30px; }

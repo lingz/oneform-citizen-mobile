@@ -22,7 +22,7 @@
         return $scope.sideMenuController.toggleLeft();
       };
       $scope.isLoading = true;
-      $scope.loadingMessage = " ";
+      $scope.loadingMessage = "oneForm";
       return $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
         return $scope.closeLeft();

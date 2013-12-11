@@ -11,15 +11,18 @@ $search-dark-blue: rgb(184,185,205);
   color: $dark-blue;
   position: absolute;
   width: 100%;
-  @include calc(height, "100% - 43px");
-  top: 43px;
+  height: 100%;
+  padding-top: 43px;
   background: white;
-  opacity: 0;
   z-index: 10;
   pointer-events: none;
   @include vendor-prefix(transition, "opacity 0.5s");
   &.isLoading {
     opacity: 1;
+    visibility: visible;
+  }
+  &.notLoading {
+    opacity: 0;
     visibility: visible;
   }
   img {

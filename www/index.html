@@ -26,14 +26,14 @@
   <script src="js/extra.js"></script>
 </head>
 <body ng-controller="menuController">
+  <div id="loading" class="isLoading" ng-class="{'notLoading': !isLoading}">
+    <img class="big-logo" src="img/logo.png">
+    <div>
+      {{loadingMessage.length > 0 ? loadingMessage : "Loading..." }}
+    </div>
+  </div>
   <side-menus>
     <pane side-menu-content>
-      <div id="loading" ng-class="{'isLoading': isLoading}">
-        <img class="big-logo" src="img/logo.png">
-        <div>
-          {{loadingMessage.length > 0 ? loadingMessage : "Loading..." }}
-        </div>
-      </div>
       <header class="bar bar-header">
         <button class="button button-icon" ng-click="toggleLeft()">
           <i class="icon ion-navicon"></i>
