@@ -41,4 +41,7 @@ app1.directive "inputField", ->
     link: (scope, element, attrs) ->
       scope.keyup = ($event) ->
         scope.fieldInfo.value = element.find("input").val()
+      console.log("attrs")
+      console.log(attrs)
+      scope.htmltype = attrs.htmltype
   }

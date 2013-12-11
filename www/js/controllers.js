@@ -54,7 +54,7 @@
         } else {
           data = {
             email: user.email.value,
-            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.secret.value).toString()
+            secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
           };
           localStorageService.add('email', data["email"]);
           localStorageService.add('secret', data["secret"]);

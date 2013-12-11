@@ -22,8 +22,8 @@ $search-dark-blue: rgb(184,185,205);
 .big-logo {
   position: relative;
   width: 200px;
-  margin-top: 50px;
-  margin-bottom: 50px;
+  margin-top: 30px;
+  margin-bottom: 30px;
 }
 
 sidemenu {
@@ -51,16 +51,10 @@ a, input[type="submit"] {
   }
 }
 
-input-field input{
-  margin-bottom: 20px;
-  color: $dark-blue;
-  font-weight: 300;
-}
 
 #login {
   text-align: center;
   input[type="submit"] {
-    margin-top: 30px;
     font-size: 3em;
     border: none;
     color: $dark-blue

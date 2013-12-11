@@ -15,14 +15,18 @@ form > ol > input-field > li {
   position: relative;
   margin: 1.2em; }
 
-input {
+input, input[type="text"], input[type="password"] {
   padding: 0.1em 0em;
   border: none;
   border-radius: 0px;
   border-bottom: 2px solid #b8b9cd;
   outline: none;
   margin: 0px;
-  background: none; }
+  background: none;
+  margin-bottom: 20px;
+  color: #180853;
+  font-weight: 300;
+  display: inline; }
 
 /**** HERE THE MAGIC STARTS *****/
 /* Original label position: top left and small */
@@ -127,8 +131,8 @@ html, body, h1, h2, h3, h4, h5, h6, input {
 .big-logo {
   position: relative;
   width: 200px;
-  margin-top: 50px;
-  margin-bottom: 50px; }
+  margin-top: 30px;
+  margin-bottom: 30px; }
 
 sidemenu {
   width: 100%; }
@@ -153,15 +157,9 @@ a, input[type="submit"] {
   a:hover, input[type="submit"]:hover {
     opacity: 1; }
 
-input-field input {
-  margin-bottom: 20px;
-  color: #180853;
-  font-weight: 300; }
-
 #login {
   text-align: center; }
   #login input[type="submit"] {
-    margin-top: 30px;
     font-size: 3em;
     border: none;
     color: #180853; }

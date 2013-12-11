@@ -20,7 +20,7 @@ form > ol > input-field > li {
     margin: 1.2em;
 }
 
-input {
+input, input[type="text"], input[type="password"] {
     padding: 0.1em 0em;
     border: none;
     border-radius: 0px;
@@ -28,6 +28,10 @@ input {
     outline: none;
     margin: 0px;
     background: none;
+    margin-bottom: 20px;
+    color: $dark-blue;
+    font-weight: 300;
+    display: inline;
 }
 
 /**** HERE THE MAGIC STARTS *****/

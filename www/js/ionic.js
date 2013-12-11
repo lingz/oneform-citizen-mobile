@@ -2621,11 +2621,14 @@ var Scroller;
   resize: function() {
     // Update Scroller dimensions for changed content
     // Add padding to bottom of content
-    this.setDimensions(
-    	Math.min(this.__container.clientWidth, this.__container.parentElement.clientWidth), 
-    	Math.min(this.__container.clientHeight, this.__container.parentElement.clientHeight), 
-    	this.__content.offsetWidth, 
-    	this.__content.offsetHeight+20);
+    var self = this;
+    setTimeout(function() {
+      self.setDimensions(
+    	Math.min(self.__container.clientWidth, self.__container.parentElement.clientWidth), 
+    	Math.min(self.__container.clientHeight, self.__container.parentElement.clientHeight), 
+    	self.__content.offsetWidth, 
+    	self.__content.offsetHeight-20);
+    }, 1000); 
   },
   /*
   ---------------------------------------------------------------------------
@@ -2695,7 +2698,6 @@ var Scroller;
    * @param contentHeight {Integer ? null} Outer height of inner element
    */
   setDimensions: function(clientWidth, clientHeight, contentWidth, contentHeight) {
-
     var self = this;
 
     // Only update values which are defined
@@ -3519,6 +3521,7 @@ var Scroller;
       self.__scheduledLeft = self.__scrollLeft = left;
       self.__scheduledTop = self.__scrollTop = top;
       self.__scheduledZoom = self.__zoomLevel = zoom;
+
 
       // Push values out
       if (self.__callback) {

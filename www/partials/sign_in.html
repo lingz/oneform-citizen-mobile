@@ -1,9 +1,9 @@
 <div id="login">
-  <img class="big-logo" src="/img/logo.png">
+  <img class="big-logo" src="img/logo.png">
 	<form name="signInForm" ng-controller="SignInController" method="POST" novalidate ng-submit="signIn(user)">
     <ol>
       <input-field field="user.email"></input-field>
-      <input-field field="user.secret"></input-field>
+      <input-field field="user.secret" htmltype="password"></input-field>
     </ol>
 		<input type="submit" value="Sign In" class="medium-text">
 	</form>
