@@ -7,7 +7,9 @@
       data = JSON.stringify(data);
     }
     if (success === null) {
-      success = function() {};
+      success = function() {
+        return console.log(data);
+      };
     }
     if (error === null) {
       error = function() {};
