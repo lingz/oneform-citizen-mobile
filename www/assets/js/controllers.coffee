@@ -163,6 +163,7 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
     if fieldData?
       console.log (true)
       $scope.status = "sending"
+      succesfullUpload = true
       for field in fieldData
         data =
           _id: User['data']['_id']
@@ -174,11 +175,22 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
         success = (data,textStatus,jqXHR) -> 
           console.log ("data result")
           console.log (data)
+          if data.status != 200
+            succesfullUpload = false
           $scope.status = "confirmed"    
           console.log("success")
-        make_request(route,"POST", data ,success)
-     else
-      raise_error_message("Required fields missingcd r")
+        make_request(route,"POST", data ,success) 
+      if succesfullUpload == true
+        routeForm = "/users/"+User['data']['_id']+"/forms"
+        dataForm =
+          _id: User['data']['_id']
+          secret: User['data']['secret']
+          formId: $scope._id
+        make_request(routeForm,"POST", data, success)
+      else
+        raise_error_message("Error uploading form")
+    else
+      raise_error_message("Required fields missing")
 
 ]
 
@@ -192,8 +204,19 @@ app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, for
 ]
 
 
-app1.controller "MyDataController", ['$scope', 'User', ($scope, User) ->
+app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', ($scope, User, fieldsService) ->
     console.log (User)
-    $scope.mydata = User.data
+    mydata = {'profile':[],'data':[]}
+    console.log ("MYUSER")
+    console.log (fieldsService)
+    for key, value of User['data']['profile']
+      mydata['profile'].push([key,value])
+    for key, value of User['data']['data']
+      console.log 
+      mydata['data'].push([fieldsService['data'][key]['name'],value['value']])
+    $scope.mydata = mydata
+    console.log ("MYDATA2")
+    console.log ($scope.mydata)
+    console.log (fieldsService)
 ]
 

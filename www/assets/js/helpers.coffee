@@ -6,6 +6,7 @@ window.make_request = (route, type, data, success, error) ->
     data = JSON.stringify(data)
   if success == null
     success = ()->
+      console.log (data)
   if error == null
     error = ()->
   $.ajax(

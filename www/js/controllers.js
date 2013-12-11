@@ -202,14 +202,14 @@
         }
       };
       return $scope.post_form = function() {
-        var data, field, fieldData, route, success, _j, _len1, _results;
+        var data, dataForm, field, fieldData, route, routeForm, succesfullUpload, success, _j, _len1;
         console.log("thsisi");
         console.log(User);
         fieldData = $scope.fields;
         if (fieldData != null) {
           console.log(true);
           $scope.status = "sending";
-          _results = [];
+          succesfullUpload = true;
           for (_j = 0, _len1 = fieldData.length; _j < _len1; _j++) {
             field = fieldData[_j];
             data = {
@@ -223,14 +223,27 @@
             success = function(data, textStatus, jqXHR) {
               console.log("data result");
               console.log(data);
+              if (data.status !== 200) {
+                succesfullUpload = false;
+              }
               $scope.status = "confirmed";
               return console.log("success");
             };
-            _results.push(make_request(route, "POST", data, success));
+            make_request(route, "POST", data, success);
           }
-          return _results;
+          if (succesfullUpload === true) {
+            routeForm = "/users/" + User['data']['_id'] + "/forms";
+            dataForm = {
+              _id: User['data']['_id'],
+              secret: User['data']['secret'],
+              formId: $scope._id
+            };
+            return make_request(routeForm, "POST", data, success);
+          } else {
+            return raise_error_message("Error uploading form");
+          }
         } else {
-          return raise_error_message("Required fields missingcd r");
+          return raise_error_message("Required fields missing");
         }
       };
     }
@@ -248,9 +261,30 @@
   ]);
 
   app1.controller("MyDataController", [
-    '$scope', 'User', function($scope, User) {
+    '$scope', 'User', 'fieldsService', function($scope, User, fieldsService) {
+      var key, mydata, value, _ref, _ref1;
       console.log(User);
-      return $scope.mydata = User.data;
+      mydata = {
+        'profile': [],
+        'data': []
+      };
+      console.log("MYUSER");
+      console.log(fieldsService);
+      _ref = User['data']['profile'];
+      for (key in _ref) {
+        value = _ref[key];
+        mydata['profile'].push([key, value]);
+      }
+      _ref1 = User['data']['data'];
+      for (key in _ref1) {
+        value = _ref1[key];
+        console.log;
+        mydata['data'].push([fieldsService['data'][key]['name'], value['value']]);
+      }
+      $scope.mydata = mydata;
+      console.log("MYDATA2");
+      console.log($scope.mydata);
+      return console.log(fieldsService);
     }
   ]);
 
