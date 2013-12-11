@@ -2,6 +2,7 @@
 @import "sidemenu";
 @import "input";
 @import "loading";
+@import "login";
 @import url(http://fonts.googleapis.com/css?family=Roboto:400,300,100);
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
@@ -22,7 +23,6 @@ $search-dark-blue: rgb(184,185,205);
 .big-logo {
   position: relative;
   width: 200px;
-  margin-top: 30px;
   margin-bottom: 30px;
 }
 
@@ -33,7 +33,7 @@ sidemenu {
 header.bar.bar-header {
   background-color: white !important;
   border: none !important;
-  h1.title {
+  a.title {
     font-size: 2em;
     color: $dark-blue;
   }
@@ -51,24 +51,8 @@ a, input[type="submit"] {
   }
 }
 
-
-#login {
-  text-align: center;
-  input[type="submit"] {
-    font-size: 3em;
-    border: none;
-    color: $dark-blue
-  }
-  a {
-    margin-top: 20px;
-    display: block;
-    text-decoration: none;
-    color: $dark-blue;
-    &:hover {
-      text-decoration: none;
-      color: $dark-blue;
-    }
-  }
+.item {
+  border: none;
 }
 
 #errors {

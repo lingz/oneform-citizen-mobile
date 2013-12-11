@@ -121,6 +121,23 @@ input.empty + label {
     opacity: 1;
     visibility: visible; }
 
+#login, #sign-up {
+  text-align: center;
+  padding-top: 30px; }
+  #login input[type="submit"], #sign-up input[type="submit"] {
+    font-size: 3em;
+    border: none;
+    color: #180853; }
+  #login a, #sign-up a {
+    margin-top: 20px;
+    font-size: 1.2em;
+    display: block;
+    text-decoration: none;
+    color: #180853; }
+    #login a:hover, #sign-up a:hover {
+      text-decoration: none;
+      color: #180853; }
+
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important; }
 
@@ -131,7 +148,6 @@ html, body, h1, h2, h3, h4, h5, h6, input {
 .big-logo {
   position: relative;
   width: 200px;
-  margin-top: 30px;
   margin-bottom: 30px; }
 
 sidemenu {
@@ -140,7 +156,7 @@ sidemenu {
 header.bar.bar-header {
   background-color: white !important;
   border: none !important; }
-  header.bar.bar-header h1.title {
+  header.bar.bar-header a.title {
     font-size: 2em;
     color: #180853; }
   header.bar.bar-header .ion-navicon {
@@ -157,20 +173,8 @@ a, input[type="submit"] {
   a:hover, input[type="submit"]:hover {
     opacity: 1; }
 
-#login {
-  text-align: center; }
-  #login input[type="submit"] {
-    font-size: 3em;
-    border: none;
-    color: #180853; }
-  #login a {
-    margin-top: 20px;
-    display: block;
-    text-decoration: none;
-    color: #180853; }
-    #login a:hover {
-      text-decoration: none;
-      color: #180853; }
+.item {
+  border: none; }
 
 #errors {
   background: #60648f;

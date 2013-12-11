@@ -10,10 +10,16 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
 ]
 
 app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
-  $scope.openLeft = () ->
+  $scope.closeLeft = () ->
+    $scope.sideMenuController.close()
+  $scope.toggleLeft = () ->
     $scope.sideMenuController.toggleLeft()
   $scope.isLoading = false
   $scope.loadingMessage = ""
+  $scope.$on("$routeChangeSuccess", () ->
+    console.log("running")
+    $scope.closeLeft()
+  )
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -90,6 +96,23 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
 
 app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
   $scope.userSignUp= {}
+  $scope.user =
+    firstName:
+      name: "First Name"
+      id: "firstName"
+    lastName:
+      name: "Last Name"
+      id: "lastName"
+    email:
+      name: "Email"
+      id: "email"
+    uniqueId:
+      name: "UDID (Emirates Id Number)"
+      id: "internalId"
+    password:
+      name: "Password"
+      id: "password"
+
   $scope.signUp = (user) ->
     console.log($scope.signUpForm.$valid)
     if $scope.signUpForm.$valid

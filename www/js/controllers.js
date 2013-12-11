@@ -16,11 +16,18 @@
 
   app1.controller("menuController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
-      $scope.openLeft = function() {
+      $scope.closeLeft = function() {
+        return $scope.sideMenuController.close();
+      };
+      $scope.toggleLeft = function() {
         return $scope.sideMenuController.toggleLeft();
       };
       $scope.isLoading = false;
-      return $scope.loadingMessage = "";
+      $scope.loadingMessage = "";
+      return $scope.$on("$routeChangeSuccess", function() {
+        console.log("running");
+        return $scope.closeLeft();
+      });
     }
   ]);
 
@@ -119,6 +126,28 @@
   app1.controller("SignUpController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
       $scope.userSignUp = {};
+      $scope.user = {
+        firstName: {
+          name: "First Name",
+          id: "firstName"
+        },
+        lastName: {
+          name: "Last Name",
+          id: "lastName"
+        },
+        email: {
+          name: "Email",
+          id: "email"
+        },
+        uniqueId: {
+          name: "UDID (Emirates Id Number)",
+          id: "internalId"
+        },
+        password: {
+          name: "Password",
+          id: "password"
+        }
+      };
       return $scope.signUp = function(user) {
         var data, success;
         console.log($scope.signUpForm.$valid);
