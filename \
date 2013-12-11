@@ -32,7 +32,6 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
   $scope.signIn = (user, email, secret) ->
     console.log (email)
     console.log (secret)
-    console.log(user)
     console.log ("authenticating3")
     if email? and secret?
       console.log ("authenticating2")
@@ -83,7 +82,7 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
   local['secret'] = localStorageService.get('secret')
   console.log (local)
 
-  if local.email? and local.secret?
+  if local
     console.log ("authenticating1")
     $scope.signIn("", local['email'], local['secret'])
 ]

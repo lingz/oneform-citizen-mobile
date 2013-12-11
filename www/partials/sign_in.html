@@ -1,14 +1,11 @@
-<div>
+<div id="login">
+  <img class="big-logo" src="/img/logo.png">
 	<form name="signInForm" ng-controller="SignInController" method="POST" novalidate ng-submit="signIn(user)">
-		<h2>e-mail</h2>
-		<input type="text" ng-model="user.email" required>
-		<h2>password</h2>
-		<input type="password" ng-model="user.password" required>
-		<button type="submit">Sign In</button>
-		<p>or</p>
-		<a href="#/sign_up">Sign Up</a>
-		<label>
-		<input type="checkbox" name="remember" data-ng-click="rememberMe()" data-ng-model="remember"> &nbsp; Remember Me
-		</label>
+    <ol>
+      <input-field field="user.email"></input-field>
+      <input-field field="user.secret"></input-field>
+    </ol>
+		<input type="submit" value="Sign In" class="medium-text">
 	</form>
+  <a href="#/sign_up" class="medium-text">First Time?</a>
 </div>

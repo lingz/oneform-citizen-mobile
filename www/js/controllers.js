@@ -27,10 +27,23 @@
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', 'localStorageService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) {
       var local;
+      $scope.user = {
+        email: {
+          name: "Email",
+          _id: "userEmail",
+          value: ""
+        },
+        secret: {
+          name: "Password",
+          _id: "userPassword",
+          value: ""
+        }
+      };
       $scope.signIn = function(user, email, secret) {
         var data, success;
         console.log(email);
         console.log(secret);
+        console.log(user);
         console.log("authenticating3");
         if ((email != null) && (secret != null)) {
           console.log("authenticating2");
@@ -40,8 +53,8 @@
           };
         } else {
           data = {
-            email: user.email,
-            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.password).toString()
+            email: user.email.value,
+            secret: CryptoJS.SHA512(user.email + 'oneform.in' + user.secret.value).toString()
           };
           localStorageService.add('email', data["email"]);
           localStorageService.add('secret', data["secret"]);
@@ -96,7 +109,7 @@
       local['email'] = localStorageService.get('email');
       local['secret'] = localStorageService.get('secret');
       console.log(local);
-      if (local) {
+      if ((local.email != null) && (local.secret != null)) {
         console.log("authenticating1");
         return $scope.signIn("", local['email'], local['secret']);
       }

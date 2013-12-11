@@ -1,4 +1,10 @@
 /* Credits: http://codepen.io/psorowka/full/JrKbE */
+$notif-blue: rgb(96, 100, 143);
+$light-grey: rgb(149,151,154);
+$dark-blue: rgb(24,8,83);
+$light-blue: rgb(216,216,228);
+$search-dark-blue: rgb(184,185,205);
+
 input, label {
     font-size: 1.5em;
     font-family: Share Tech,sans;
@@ -18,7 +24,7 @@ input {
     padding: 0.1em 0em;
     border: none;
     border-radius: 0px;
-    border-bottom: 1px solid #555;
+    border-bottom: 2px solid $search-dark-blue;
     outline: none;
     margin: 0px;
     background: none;
@@ -28,11 +34,11 @@ input {
 /* Original label position: top left and small */
 label {
     position: absolute;
-    top: -1em;
+    top: -1.5em;
     left: 0.08em;
-    color: #aaaaaa;
+    color: $light-grey;
     z-index:-1;
-    font-size: 0.85em;
+    font-size: 1.2em;
     animation: float-labels 300ms none ease-out;
   -webkit-animation: float-labels 300ms none ease-out;
    
@@ -43,7 +49,7 @@ label {
 
 /* Label highlight effect also for non-JS browsers */
 input:not(.empty):focus + label {
-    color: #0099ff;
+    color: $dark-blue;
 }
 
 /* In JS Browsers the .empty class is assigned to empty inputs -> label is rendered like a placeholder in the input field */
@@ -59,7 +65,7 @@ input.empty + label {
   
    0% {
     opacity:1;
-    color:#aaa;
+    color:$light-grey;
     top:0.1em;
     font-size:1.5em;
   }
@@ -72,10 +78,10 @@ input.empty + label {
   }
   50% {
     opacity:0;
-    font-size:0.85em;
+    font-size:1.2em;
   }
   100% {
-    top:-1em; 
+    top:-1.5em; 
     opacity:1; 
   }
 }
@@ -83,7 +89,7 @@ input.empty + label {
   
  0% {
     opacity:1;
-    color:#aaa;
+    color:$light-grey;
     top:0.1em;
     font-size:1.5em;
   }
@@ -96,10 +102,10 @@ input.empty + label {
   }
   50% {
     opacity:0;
-    font-size:0.85em;
+    font-size:1.2em;
   }
   100% {
-    top:-1em; 
+    top:-1.5em; 
     opacity:1; 
   }
 }

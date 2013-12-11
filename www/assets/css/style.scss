@@ -2,12 +2,109 @@
 @import "sidemenu";
 @import "input";
 @import "loading";
+@import url(http://fonts.googleapis.com/css?family=Roboto:400,300,100);
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important;
 }
 
 /* Misc */
+html, body, h1, h2, h3, h4, h5, h6, input {
+  font-family: 'Roboto', sans-serif !important;
+}
+
+$notif-blue: rgb(96, 100, 143);
+$light-grey: rgb(149,151,154);
+$dark-blue: rgb(24,8,83);
+$light-blue: rgb(216,216,228);
+$search-dark-blue: rgb(184,185,205);
+
+.big-logo {
+  position: relative;
+  width: 200px;
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
 sidemenu {
   width: 100%;
+}
+
+header.bar.bar-header {
+  background-color: white !important;
+  border: none !important;
+  h1.title {
+    font-size: 2em;
+    color: $dark-blue;
+  }
+  .ion-navicon {
+    color: black;
+    font-size: 4em;
+  }
+}
+
+a, input[type="submit"] {
+  opacity: 0.8;
+  @include vendor-prefix(transition, "opacity 1s");
+  &:hover {
+    opacity: 1;
+  }
+}
+
+input-field input{
+  margin-bottom: 20px;
+  color: $dark-blue;
+  font-weight: 300;
+}
+
+#login {
+  text-align: center;
+  input[type="submit"] {
+    margin-top: 30px;
+    font-size: 3em;
+    border: none;
+    color: $dark-blue
+  }
+  a {
+    margin-top: 20px;
+    display: block;
+    text-decoration: none;
+    color: $dark-blue;
+    &:hover {
+      text-decoration: none;
+      color: $dark-blue;
+    }
+  }
+}
+
+#errors {
+  background: $notif-blue;
+  color: white;
+  font-size: 1.5em;
+  width: 100%;
+  font-weight: 300;
+  text-align: center;
+  position: absolute;
+  height: 80px;
+  line-height: 80px;
+  bottom: -80px;
+  @include vendor-prefix(transition, "bottom 0.5s");
+  &.raised {
+    bottom: 0px;
+  }
+  span {
+    display:inline-block; 
+    vertical-align:middle;
+    line-height: 22px;
+  }
+}
+
+.light-text {
+  font-weight: 100;
+}
+.medium-text {
+  font-weight: 300; 
+}
+.heavy-text {
+  font-weight: 400; 
 }
