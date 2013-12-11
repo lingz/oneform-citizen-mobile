@@ -24,11 +24,9 @@
   });
 
   srv.factory('fieldsService', function() {
-    var info;
-    info = {
+    return {
       data: null
     };
-    return info;
   });
 
 }).call(this);

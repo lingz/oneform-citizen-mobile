@@ -1,6 +1,7 @@
 window.serverAddress = "http://ec2-54-218-85-114.us-west-2.compute.amazonaws.com"
 
 window.make_request = (route, type, data, success, error) ->
+ 
   if type == "POST" or type == "PUT"
     data = JSON.stringify(data)
   if success == null

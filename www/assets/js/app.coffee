@@ -50,6 +50,6 @@ app.run ($rootScope, $location, User) ->
   $rootScope.$watch(
     => $location.path(),
     (next, prev) ->
-      if not User.authenticated and not (next is '/sign_in' or next is '/sign_up')
+      if not User.authenticated
         $location.path("/sign_in")
   )

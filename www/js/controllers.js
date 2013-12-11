@@ -6,7 +6,7 @@
   app1 = angular.module("myApp.controllers", []);
 
   app1.controller("LogoutController", [
-    '$scope', '$location', 'localStorageService', 'UserService', function($scope, $location, localStorageService, UserService) {
+    '$scope', '$location', 'localStorageService', 'User', function($scope, $location, localStorageService, User) {
       console.log("logging out");
       localStorageService.clearAll();
       User.authenticated = false;
@@ -47,8 +47,12 @@
         success = function(data, status, headers, config) {
           var successFields, successForms;
           if (data.result != null) {
+            console.log("user");
             console.log(User);
+            console.log("data");
+            console.log(data.result);
             User.data = data.result;
+            User.data['secret'] = secret;
             User.authenticated = true;
             $rootScope.$apply();
             successForms = function(data, status, headers, config) {
@@ -147,25 +151,40 @@
       $scope.update = function(fieldName, answer) {
         var data;
         if ($scope.fieldName.$valid && UserService.isLogged === true) {
-          console.log('signed in');
-          data = {
+          return data = {
             id: UserService.data["id"],
             secret: UserService.secret
           };
-          return make_request("/users/:id", POST, data, success);
         }
       };
-      return $scope.post_form = function(_form_answers) {
-        var data, success;
-        if ($scope._form_name.$valid) {
-          console.log($scope._form_answers);
-          data = $scope._form_answers;
-          console.log(data);
-          success = function() {
-            console.log("response: ");
-            return console.log(data);
-          };
-          return make_request("/users/:id/forms", "POST", data, success);
+      return $scope.post_form = function() {
+        var data, field, fieldData, route, success, _j, _len1, _results;
+        console.log("thsisi");
+        console.log(User);
+        fieldData = $scope.fields;
+        if (fieldData != null) {
+          console.log(true);
+          $scope.status = "sending";
+          _results = [];
+          for (_j = 0, _len1 = fieldData.length; _j < _len1; _j++) {
+            field = fieldData[_j];
+            data = {
+              _id: User['data']['_id'],
+              secret: User['data']['secret'],
+              fieldId: field._id,
+              value: field.value
+            };
+            console.log(data);
+            route = "/users/" + User['data']['_id'] + "/data";
+            success = function(data, textStatus, jqXHR) {
+              console.log("data result");
+              console.log(data);
+              $scope.status = "confirmed";
+              return console.log("success");
+            };
+            _results.push(make_request(route, "POST", data, success));
+          }
+          return _results;
         } else {
           return raise_error_message("Required fields missingcd r");
         }

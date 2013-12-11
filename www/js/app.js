@@ -63,7 +63,7 @@
     return $rootScope.$watch(function() {
       return $location.path();
     }, function(next, prev) {
-      if (!User.authenticated && !(next === '/sign_in' || next === '/sign_up')) {
+      if (!User.authenticated) {
         return $location.path("/sign_in");
       }
     });

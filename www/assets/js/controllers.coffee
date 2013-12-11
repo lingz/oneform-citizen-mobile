@@ -2,7 +2,7 @@
 app1 = angular.module("myApp.controllers", [])
 
 
-app1.controller "LogoutController", ['$scope', '$location', 'localStorageService', 'UserService', ($scope, $location, localStorageService, UserService) ->
+app1.controller "LogoutController", ['$scope', '$location', 'localStorageService', 'User', ($scope, $location, localStorageService, User) ->
   console.log("logging out")
   localStorageService.clearAll()
   User.authenticated = false
@@ -15,7 +15,7 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
- 'formsService', 'fieldsService','localStorageService', \
+ 'formsService', 'fieldsService','localStorageService',\
  ($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) ->
   
   $scope.signIn = (user, email, secret) ->
@@ -36,8 +36,12 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
 
     success = (data, status, headers, config) ->
       if data.result?
+        console.log ("user")
         console.log(User)
+        console.log("data")
+        console.log (data.result)
         User.data = data.result
+        User.data['secret'] = secret
         User.authenticated = true
         $rootScope.$apply()
         successForms = (data, status, headers, config) ->
@@ -98,7 +102,8 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scop
       raise_error_message("Required fields missing")
 ]
 
-app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', ($scope, $routeParams, User, formsService, fieldsService)->
+app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService',\
+($scope, $routeParams, User, formsService, fieldsService)->
   $scope._id = $routeParams._id
   console.log ("scope._id, formsService, fieldsService")
   console.log($scope._id)
@@ -111,23 +116,33 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
 
   $scope.update = (fieldName,answer) ->
     if $scope.fieldName.$valid and UserService.isLogged is true
-      console.log ('signed in')
       data =
         id: UserService.data["id"]
         secret: UserService.secret
-      make_request("/users/:id", POST, data, success)
+      # make_request("/users/:id", POST, data, success)
 
-  $scope.post_form = (_form_answers) ->
-    if $scope._form_name.$valid
-      console.log $scope._form_answers
-      data = $scope._form_answers
-      console.log(data)
-      success = ->
-        #$location.path("home")
-        console.log("response: ")
-        console.log(data)
-      make_request("/users/:id/forms", "POST", data, success)
-    else
+  $scope.post_form = () ->
+    console.log ("thsisi")
+    console.log (User)
+    fieldData = $scope.fields
+    if fieldData?
+      console.log (true)
+      $scope.status = "sending"
+      for field in fieldData
+        data =
+          _id: User['data']['_id']
+          secret: User['data']['secret']
+          fieldId: field._id
+          value: field.value
+        console.log (data)
+        route = "/users/"+User['data']['_id']+"/data"
+        success = (data,textStatus,jqXHR) -> 
+          console.log ("data result")
+          console.log (data)
+          $scope.status = "confirmed"    
+          console.log("success")
+        make_request(route,"POST", data ,success)
+     else
       raise_error_message("Required fields missingcd r")
 
 ]

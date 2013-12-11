@@ -3,10 +3,10 @@
 		<div ng-repeat="field in fields">
 			<br/>
 				<label for="{{field._id}}">{{field.name}}</label>
-				<input type="{{field.htmlType}}" id="{{field._id}}"></input>
+				<input type="{{field.htmlType}}" id="{{field._id}}" ng-model="field.value"></input>
 				{{field.description}}
 			<br/>
 		</div>
-		<button ng-click="submitForm(form)" value="Submit">Submit</button>
+		<button ng-click="post_form()" value="Submit">Submit</button>
 	</form>
 
