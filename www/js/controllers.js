@@ -21,8 +21,8 @@
       $scope.toggleLeft = function() {
         return $scope.sideMenuController.toggleLeft();
       };
-      $scope.isLoading = false;
-      $scope.loadingMessage = "";
+      $scope.isLoading = true;
+      $scope.loadingMessage = " ";
       return $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
         return $scope.closeLeft();
