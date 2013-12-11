@@ -1,19 +1,32 @@
 @import "mixins";
 
+$notif-blue: rgb(96, 100, 143);
+$light-grey: rgb(149,151,154);
+$dark-blue: rgb(24,8,83);
+$light-blue: rgb(216,216,228);
+$search-dark-blue: rgb(184,185,205);
+
 #loading {
-  color: white;
+  text-align: center;
+  color: $dark-blue;
   position: absolute;
   width: 100%;
   @include calc(height, "100% - 43px");
   top: 43px;
-  background: rgba(0,0,0,0.5);
+  background: white;
   opacity: 0;
   z-index: 10;
-  visibility: hidden;
-  @include vendor-prefix(transition, "opacity 1s");
+  pointer-events: none;
+  @include vendor-prefix(transition, "opacity 0.5s");
   &.isLoading {
     opacity: 1;
     visibility: visible;
+  }
+  img {
+    margin-top: 30px
+  }
+  div {
+    font-size: 2em;
   }
 }
 
