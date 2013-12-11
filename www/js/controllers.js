@@ -5,6 +5,14 @@
 
   app1 = angular.module("myApp.controllers", []);
 
+  app1.controller("menuController", [
+    '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+      return $scope.openLeft = function() {
+        return $scope.sideMenuController.toggleLeft();
+      };
+    }
+  ]);
+
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService) {
       return $scope.signIn = function(user) {

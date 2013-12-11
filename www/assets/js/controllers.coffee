@@ -1,6 +1,11 @@
 "use strict"
 app1 = angular.module("myApp.controllers", [])
 
+app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+  $scope.openLeft = () ->
+    $scope.sideMenuController.toggleLeft()
+]
+
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', ($scope, $http, User, $location, $rootScope, formsService, fieldsService) ->
   $scope.signIn = (user) ->

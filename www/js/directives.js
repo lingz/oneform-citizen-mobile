@@ -35,4 +35,11 @@
     }
   ]);
 
+  app1.directive("sidemenu", function() {
+    return {
+      restrict: "E",
+      templateUrl: "partials/sidemenu.html"
+    };
+  });
+
 }).call(this);

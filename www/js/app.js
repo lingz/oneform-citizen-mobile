@@ -5,7 +5,7 @@
 
   isDeveloper = true;
 
-  app = angular.module("myApp", ["ngRoute", "myApp.filters", "myApp.services", "myApp.controllers"]);
+  app = angular.module("myApp", ["ionic", "myApp.filters", "myApp.services", "myApp.controllers", "myApp.directives", "ngRoute"]);
 
   app.config([
     "$routeProvider", function($routeProvider) {

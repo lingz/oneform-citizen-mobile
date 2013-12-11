@@ -17,3 +17,9 @@ app1.directive "checkUser", ["$rootScope", "$location", "userSrv", ($root, $loca
       $location.path("/view1") if not prevRoute.access.isFree and not userSrv.isLogged
 
 ]
+
+app1.directive "sidemenu", ->
+  return {
+    restrict: "E",
+    templateUrl: "partials/sidemenu.html"
+  }
