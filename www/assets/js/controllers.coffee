@@ -10,21 +10,33 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
 ]
 
 app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+  $scope.appLoaded = false
   $scope.closeLeft = () ->
     $scope.sideMenuController.close()
   $scope.toggleLeft = () ->
     $scope.sideMenuController.toggleLeft()
-  $scope.isLoading = false
-  $scope.loadingMessage = ""
+  $scope.isLoading = true
+  $scope.loadingMessage = "oneForm"
   $scope.$on("$routeChangeSuccess", () ->
     console.log("running")
+    $scope.$broadcast('scroll.resize')
     $scope.closeLeft()
   )
-  $rootScope.startLoad = () ->
+  $rootScope.startLoad = (loadingMessage) ->
     $scope.isLoading = true
-  $rootScope.stopLoad = () ->
-    $scope.isLoading = false
+    $scope.loadingMessage = if loadingMessage then loadingMessage else "Loading..."
 
+  $rootScope.stopLoad = () ->
+    $scope.appLoaded = true
+    $scope.isLoading = false
+    $scope.loadingMessage = "Loading..."
+    $rootScope.$apply()
+
+  $rootScope.appReady = () ->
+    $scope.appLoaded = true
+
+  $rootScope.appUnready = () ->
+    $scope.appLoaded = false
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -40,6 +52,7 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
       name: "Password"
       _id: "userPassword"
       value: ""
+
   $scope.signIn = (user, email, secret) ->
     console.log (email)
     console.log (secret)
@@ -47,18 +60,20 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
     console.log ("authenticating3")
     if email? and secret?
       console.log ("authenticating2")
-      data =
+      originalData =
         email: email
         secret: secret
     else
-      data =
+      originalData =
         email: user.email.value
         secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
-      localStorageService.add('email',data["email"])
-      localStorageService.add('secret',data["secret"])
 
-    $rootScope.startLoad()
+    console.log("success here!kjhx;")
+    loadMessage = if $scope.loadingMessage then $scope.loadingMessage else "Loading..."
+    $rootScope.startLoad(loadMessage)
     success = (data, status, headers, config) ->
+      localStorageService.add('email', originalData["email"])
+      localStorageService.add('secret', originalData["secret"])
       if data.result?
         console.log ("user")
         console.log(User)
@@ -69,13 +84,14 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
         User.authenticated = true
         successForms = (data, status, headers, config) ->
           if data.result?
+            console.log("success here!kjhx;")
             console.log(data.result)
             formsService.orderedData = data.result
             formData = {}
-            $rootScope.$apply(() ->
-              $location.path("/all_forms")
-              $rootScope.stopLoad()
-            )
+            $rootScope.appReady()
+            $location.path("/all_forms")
+            $rootScope.stopLoad()
+            raise_error_message("Login Successful")
             for form in data.result
               formData[form._id] = form
             formsService.data = formData
@@ -91,21 +107,31 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
         make_request("/fields", "GET", null, successFields)
       else
         raise_error_message("Incorrect email & password combination")
+        localStorageService.clearAll()
+        User.authenticated = false
+        $rootScope.stopLoad()
 
-    make_request("/auth/users", "POST", data, success)
+    make_request("/auth/users", "POST", originalData, success)
 
-  console.log ('localStorageService')
   local = {}
   local['email'] = localStorageService.get('email')
   local['secret'] = localStorageService.get('secret')
   console.log (local)
 
-  if local.email? and local.secret?
+  if User.authenticated
+    $location.path("/all_forms")
+    $rootScope.$apply()
+  else if local.email? and local.secret?
     console.log ("authenticating1")
     $scope.signIn("", local['email'], local['secret'])
+  else
+    $rootScope.appReady()
+    $rootScope.stopLoad()
 ]
 
-app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'localStorageService', ($scope, $location, $rootScope, localStorageService) ->
+  $rootScope.appReady()
+  $rootScope.stopLoad()
   $scope.userSignUp= {}
   $scope.user =
     firstName:
@@ -125,23 +151,30 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scop
       id: "password"
 
   $scope.signUp = (user) ->
+    for k, v of user
+      user[k] = v.value
+    console.log("creating user")
+    console.log(user)
     console.log($scope.signUpForm.$valid)
+    $rootScope.startLoad("Creating Account...")
     if $scope.signUpForm.$valid
       console.log $scope.userSignUp
       $scope.userSignUp = angular.copy(user)
       $scope.userSignUp["secret"] = CryptoJS.SHA512($scope.userSignUp["email"] + 'oneform.in' + $scope.userSignUp["password"]).toString()
       delete $scope.userSignUp["password"]
-      data = $scope.userSignUp
-      console.log(data)
+      originalData = $scope.userSignUp
       success = (data,textStatus,jqXHR) ->
-        console.log("response: ")
-        console.log(data)
-        $location.path("/forms")
-        $location.replace();
+        localStorageService.add('email', originalData["email"])
+        localStorageService.add('secret', originalData["secret"])
+        console.log("added to localStorageService")
+        $location.path("/sign_in")
+        $location.replace()
+        $rootScope.appUnready()
         $rootScope.$apply()
-      make_request("/users", "POST", data, success)
+      make_request("/users", "POST", originalData, success)
     else
       raise_error_message("Required fields missing")
+      $rootScope.stopLoad()
 ]
 
 app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService',\
@@ -164,11 +197,9 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
       # make_request("/users/:id", POST, data, success)
 
   $scope.post_form = () ->
-    console.log ("thsisi")
     console.log (User)
     fieldData = $scope.fields
     if fieldData?
-      console.log (true)
       $scope.status = "sending"
       succesfullUpload = true
       for field in fieldData
@@ -179,14 +210,14 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
           value: field.value
         console.log (data)
         route = "/users/"+User['data']['_id']+"/data"
-        success = (data,textStatus,jqXHR) -> 
+        success = (data,textStatus,jqXHR) ->
           console.log ("data result")
           console.log (data)
           if data.status != 200
             succesfullUpload = false
-          $scope.status = "confirmed"    
+          $scope.status = "confirmed"
           console.log("success")
-        make_request(route,"POST", data ,success) 
+        make_request(route,"POST", data ,success)
       if succesfullUpload == true
         console.log ("form:!@")
         console.log ($scope.current_form_id)
@@ -198,8 +229,10 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
         make_request(routeForm,"POST", data, success)
       else
         raise_error_message("Error uploading form")
+        $rootScope.stopLoad()
     else
       raise_error_message("Required fields missing")
+      $rootScope.stopLoad()
 
 ]
 

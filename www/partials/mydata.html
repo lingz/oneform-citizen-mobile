@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Profile
 <div ng-repeat="key in myUser['data']['profile']">
 	<h6>{{key}}</h6>
@@ -8,3 +9,17 @@ Data
 	<h6>{{myFields[key]['name']}}</h6>
 	<p>{{User['data']['data'][key]['value']}}</p>
 </div>
+=======
+<div id="my-data" class="list">
+<div class="small-query">My Data</div>
+<form novalidate class="simple-form" id="single-form">
+  <ol>
+    <input-field ng-repeat="data in mydata['profile']" field="data">
+    </input-field>
+    <input-field ng-repeat="data in mydata['data']" field="data">
+    </input-field>
+  </ol>
+  <button class="button button-clear submit medium-text submit" value="Update Data">Update Data</button>
+</form>
+</div>
+>>>>>>> fcad794b672a6bf1c7704396d9b0ed4c94bf43fd

@@ -64,7 +64,26 @@
         };
         console.log("attrs");
         console.log(attrs);
-        return scope.htmltype = attrs.htmltype;
+        scope.htmltype = attrs.htmltype;
+        scope.disabledstate = attrs.disabledstate;
+        console.log(scope.disabledstate);
+        return console.log(scope.htmltype);
+      }
+    };
+  });
+
+  app1.directive("bigQuery", function() {
+    return {
+      restrict: "E",
+      templateUrl: "partials/big-query.html",
+      scope: {
+        fieldInfo: "=field",
+        keyup: "&"
+      },
+      link: function(scope, element, attrs) {
+        return scope.keyup = function($event) {
+          return scope.fieldInfo.value = element.find("input").val();
+        };
       }
     };
   });

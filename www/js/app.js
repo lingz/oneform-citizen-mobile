@@ -63,7 +63,9 @@
     return $rootScope.$watch(function() {
       return $location.path();
     }, function(next, prev) {
-      if (!User.authenticated) {
+      if (!User.authenticated && $location.path().search("sign") === -1) {
+        console.log($location.path());
+        console.log("sending to sign in");
         return $location.path("/sign_in");
       }
     });

@@ -44,4 +44,20 @@ app1.directive "inputField", ->
       console.log("attrs")
       console.log(attrs)
       scope.htmltype = attrs.htmltype
+      scope.disabledstate = attrs.disabledstate
+      console.log(scope.disabledstate)
+      console.log(scope.htmltype)
+  }
+
+app1.directive "bigQuery", ->
+  return {
+    restrict: "E",
+    templateUrl: "partials/big-query.html",
+    scope: {
+      fieldInfo: "=field",
+      keyup: "&"
+    }
+    link: (scope, element, attrs) ->
+      scope.keyup = ($event) ->
+        scope.fieldInfo.value = element.find("input").val()
   }

@@ -1,12 +1,8 @@
-<p>form fill up</p>
-	<form novalidate class="simple-form">
-		<div ng-repeat="field in fields">
-			<br/>
-				<label for="{{field._id}}">{{field.name}}</label>
-				<input type="{{field.htmlType}}" id="{{field._id}}" ng-model="field.value"></input>
-				{{field.description}}
-			<br/>
-		</div>
-		<button ng-click="post_form(_id)" value="Submit">Submit</button>
-	</form>
+<form novalidate class="simple-form" id="single-form">
+  <ol>
+    <input-field ng-repeat="field in fields" field="field">
+    </input-field>
+  </ol>
+  <button ng-click="post_form(_id)" class="button button-clear submit medium-text submit" value="Submit">Sign Up</button>
+</form>
 

@@ -16,23 +16,35 @@
 
   app1.controller("menuController", [
     '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+      $scope.appLoaded = false;
       $scope.closeLeft = function() {
         return $scope.sideMenuController.close();
       };
       $scope.toggleLeft = function() {
         return $scope.sideMenuController.toggleLeft();
       };
-      $scope.isLoading = false;
-      $scope.loadingMessage = "";
+      $scope.isLoading = true;
+      $scope.loadingMessage = "oneForm";
       $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
+        $scope.$broadcast('scroll.resize');
         return $scope.closeLeft();
       });
-      $rootScope.startLoad = function() {
-        return $scope.isLoading = true;
+      $rootScope.startLoad = function(loadingMessage) {
+        $scope.isLoading = true;
+        return $scope.loadingMessage = loadingMessage ? loadingMessage : "Loading...";
       };
-      return $rootScope.stopLoad = function() {
-        return $scope.isLoading = false;
+      $rootScope.stopLoad = function() {
+        $scope.appLoaded = true;
+        $scope.isLoading = false;
+        $scope.loadingMessage = "Loading...";
+        return $rootScope.$apply();
+      };
+      $rootScope.appReady = function() {
+        return $scope.appLoaded = true;
+      };
+      return $rootScope.appUnready = function() {
+        return $scope.appLoaded = false;
       };
     }
   ]);
@@ -53,28 +65,30 @@
         }
       };
       $scope.signIn = function(user, email, secret) {
-        var data, success;
+        var loadMessage, originalData, success;
         console.log(email);
         console.log(secret);
         console.log(user);
         console.log("authenticating3");
         if ((email != null) && (secret != null)) {
           console.log("authenticating2");
-          data = {
+          originalData = {
             email: email,
             secret: secret
           };
         } else {
-          data = {
+          originalData = {
             email: user.email.value,
             secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
           };
-          localStorageService.add('email', data["email"]);
-          localStorageService.add('secret', data["secret"]);
         }
-        $rootScope.startLoad();
+        console.log("success here!kjhx;");
+        loadMessage = $scope.loadingMessage ? $scope.loadingMessage : "Loading...";
+        $rootScope.startLoad(loadMessage);
         success = function(data, status, headers, config) {
           var successFields, successForms;
+          localStorageService.add('email', originalData["email"]);
+          localStorageService.add('secret', originalData["secret"]);
           if (data.result != null) {
             console.log("user");
             console.log(User);
@@ -86,13 +100,14 @@
             successForms = function(data, status, headers, config) {
               var form, formData, _i, _len, _ref;
               if (data.result != null) {
+                console.log("success here!kjhx;");
                 console.log(data.result);
                 formsService.orderedData = data.result;
                 formData = {};
-                $rootScope.$apply(function() {
-                  $location.path("/all_forms");
-                  return $rootScope.stopLoad();
-                });
+                $rootScope.appReady();
+                $location.path("/all_forms");
+                $rootScope.stopLoad();
+                raise_error_message("Login Successful");
                 _ref = data.result;
                 for (_i = 0, _len = _ref.length; _i < _len; _i++) {
                   form = _ref[_i];
@@ -118,25 +133,35 @@
             };
             return make_request("/fields", "GET", null, successFields);
           } else {
-            return raise_error_message("Incorrect email & password combination");
+            raise_error_message("Incorrect email & password combination");
+            localStorageService.clearAll();
+            User.authenticated = false;
+            return $rootScope.stopLoad();
           }
         };
-        return make_request("/auth/users", "POST", data, success);
+        return make_request("/auth/users", "POST", originalData, success);
       };
-      console.log('localStorageService');
       local = {};
       local['email'] = localStorageService.get('email');
       local['secret'] = localStorageService.get('secret');
       console.log(local);
-      if ((local.email != null) && (local.secret != null)) {
+      if (User.authenticated) {
+        $location.path("/all_forms");
+        return $rootScope.$apply();
+      } else if ((local.email != null) && (local.secret != null)) {
         console.log("authenticating1");
         return $scope.signIn("", local['email'], local['secret']);
+      } else {
+        $rootScope.appReady();
+        return $rootScope.stopLoad();
       }
     }
   ]);
 
   app1.controller("SignUpController", [
-    '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+    '$scope', '$location', '$rootScope', 'localStorageService', function($scope, $location, $rootScope, localStorageService) {
+      $rootScope.appReady();
+      $rootScope.stopLoad();
       $scope.userSignUp = {};
       $scope.user = {
         firstName: {
@@ -161,25 +186,34 @@
         }
       };
       return $scope.signUp = function(user) {
-        var data, success;
+        var k, originalData, success, v;
+        for (k in user) {
+          v = user[k];
+          user[k] = v.value;
+        }
+        console.log("creating user");
+        console.log(user);
         console.log($scope.signUpForm.$valid);
+        $rootScope.startLoad("Creating Account...");
         if ($scope.signUpForm.$valid) {
           console.log($scope.userSignUp);
           $scope.userSignUp = angular.copy(user);
           $scope.userSignUp["secret"] = CryptoJS.SHA512($scope.userSignUp["email"] + 'oneform.in' + $scope.userSignUp["password"]).toString();
           delete $scope.userSignUp["password"];
-          data = $scope.userSignUp;
-          console.log(data);
+          originalData = $scope.userSignUp;
           success = function(data, textStatus, jqXHR) {
-            console.log("response: ");
-            console.log(data);
-            $location.path("/forms");
+            localStorageService.add('email', originalData["email"]);
+            localStorageService.add('secret', originalData["secret"]);
+            console.log("added to localStorageService");
+            $location.path("/sign_in");
             $location.replace();
+            $rootScope.appUnready();
             return $rootScope.$apply();
           };
-          return make_request("/users", "POST", data, success);
+          return make_request("/users", "POST", originalData, success);
         } else {
-          return raise_error_message("Required fields missing");
+          raise_error_message("Required fields missing");
+          return $rootScope.stopLoad();
         }
       };
     }
@@ -211,11 +245,9 @@
       };
       return $scope.post_form = function() {
         var data, dataForm, field, fieldData, route, routeForm, succesfullUpload, success, _j, _len1;
-        console.log("thsisi");
         console.log(User);
         fieldData = $scope.fields;
         if (fieldData != null) {
-          console.log(true);
           $scope.status = "sending";
           succesfullUpload = true;
           for (_j = 0, _len1 = fieldData.length; _j < _len1; _j++) {
@@ -250,10 +282,12 @@
             };
             return make_request(routeForm, "POST", data, success);
           } else {
-            return raise_error_message("Error uploading form");
+            raise_error_message("Error uploading form");
+            return $rootScope.stopLoad();
           }
         } else {
-          return raise_error_message("Required fields missing");
+          raise_error_message("Required fields missing");
+          return $rootScope.stopLoad();
         }
       };
     }
