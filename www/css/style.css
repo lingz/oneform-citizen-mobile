@@ -152,8 +152,9 @@ input.empty + label {
       font-size: 1em; }
 
 #single-form {
-  padding-top: 30px;
-  text-align: center; }
+  padding-top: 30px; }
+  #single-form .submit-container {
+    text-align: center; }
 
 #my-data {
   padding-top: 30px; }

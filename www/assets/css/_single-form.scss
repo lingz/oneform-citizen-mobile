@@ -6,5 +6,7 @@ $search-dark-blue: rgb(184,185,205);
 
 #single-form {
   padding-top: 30px;
-  text-align: center;
+  .submit-container {
+    text-align: center;
+  }
 }
