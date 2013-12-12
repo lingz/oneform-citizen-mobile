@@ -50,6 +50,8 @@ app.run ($rootScope, $location, User) ->
   $rootScope.$watch(
     => $location.path(),
     (next, prev) ->
-      if not User.authenticated
+      if not User.authenticated and $location.path().search("sign") == -1
+        console.log $location.path()
+        console.log("sending to sign in")
         $location.path("/sign_in")
   )

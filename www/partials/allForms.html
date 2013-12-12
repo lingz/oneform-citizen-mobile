@@ -1,12 +1,17 @@
-<p>allForms</p>
-<input-form>
-  <input-field field="query"></input-field>
-</input-form>
+<div id="all-forms" class="list">
+  <div class="big-query item">
+    <input ng-model="query.value" placeholder="Search">
+  </div>
+  <div class="small-query">
+    All Forms
+  </div>
 
-<ul decorations:"none">
-	<li ng-repeat="form in forms | filter:query.value" style="list-style-type: none">
-		<a href="#/form/{{form._id}}">{{form.name}}</a>
-		<p></p>
-	</li>
-</ul>
-<p>end</p>
+  <ul decorations:"none">
+    <li ng-repeat="form in forms | filter:query.value" style="list-style-type: none">
+      <a class="item" href="#/form/{{form._id}}">
+        <div class="heavy-text">{{form.name}}</div>
+        <div class="light-text">Org Name</div>
+      </a>
+    </li>
+  </ul>
+</div>

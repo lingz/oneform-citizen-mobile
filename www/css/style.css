@@ -3,30 +3,33 @@
   display: flex; }
 
 /* Credits: http://codepen.io/psorowka/full/JrKbE */
-input, label {
-  font-size: 1.5em;
-  font-family: Share Tech,sans; }
-
 form > ol {
   list-style: none;
   padding: 0px; }
 
 form > ol > input-field > li {
   position: relative;
-  margin: 1.2em; }
+  margin: 1.1em;
+  margin-bottom: 40px; }
 
-input, input[type="text"], input[type="password"] {
+body input, body input[type="text"], body input[type="password"] {
   padding: 0.1em 0em;
   border: none;
   border-radius: 0px;
   border-bottom: 2px solid #b8b9cd;
   outline: none;
   margin: 0px;
+  font-size: 1.6em;
   background: none;
-  margin-bottom: 20px;
   color: #180853;
   font-weight: 300;
   display: inline; }
+
+.description {
+  color: #95979a;
+  font-weight: 100;
+  font-size: 1em;
+  text-align: left; }
 
 /**** HERE THE MAGIC STARTS *****/
 /* Original label position: top left and small */
@@ -34,9 +37,10 @@ label {
   position: absolute;
   top: -1.5em;
   left: 0.08em;
-  color: #95979a;
   z-index: -1;
-  font-size: 1.2em;
+  font-size: 1.1em;
+  font-weight: 400;
+  color: #5a5a5a;
   animation: float-labels 300ms none ease-out;
   -webkit-animation: float-labels 300ms none ease-out;
   /* There is a bug sometimes pausing the animation. This avoids that.*/
@@ -45,12 +49,13 @@ label {
 
 /* Label highlight effect also for non-JS browsers */
 input:not(.empty):focus + label {
-  color: #180853; }
+  color: #0b0424; }
 
 /* In JS Browsers the .empty class is assigned to empty inputs -> label is rendered like a placeholder in the input field */
 input.empty + label {
   top: 0.1em;
-  font-size: 1.5em;
+  color: #95979a;
+  font-size: 1.3em;
   animation: none;
   -webkit-animation: none; }
 
@@ -58,12 +63,12 @@ input.empty + label {
 @keyframes float-labels {
   0% {
     opacity: 1;
-    color: #95979a;
+    color: #5a5a5a;
     top: 0.1em;
-    font-size: 1.5em; }
+    font-size: 1.3em; }
 
   20% {
-    font-size: 1.5em;
+    font-size: 1.2em;
     opacity: 0; }
 
   30% {
@@ -71,7 +76,7 @@ input.empty + label {
 
   50% {
     opacity: 0;
-    font-size: 1.2em; }
+    font-size: 1.1em; }
 
   100% {
     top: -1.5em;
@@ -80,12 +85,12 @@ input.empty + label {
 @-webkit-keyframes float-labels {
   0% {
     opacity: 1;
-    color: #95979a;
+    color: #5a5a5a;
     top: 0.1em;
-    font-size: 1.5em; }
+    font-size: 1.3em; }
 
   20% {
-    font-size: 1.5em;
+    font-size: 1.2em;
     opacity: 0; }
 
   30% {
@@ -93,7 +98,7 @@ input.empty + label {
 
   50% {
     opacity: 0;
-    font-size: 1.2em; }
+    font-size: 1.1em; }
 
   100% {
     top: -1.5em;
@@ -126,10 +131,6 @@ input.empty + label {
 #login, #sign-up {
   text-align: center;
   padding-top: 30px; }
-  #login input[type="submit"], #sign-up input[type="submit"] {
-    font-size: 3em;
-    border: none;
-    color: #180853; }
   #login a, #sign-up a {
     margin-top: 20px;
     font-size: 1.2em;
@@ -139,6 +140,23 @@ input.empty + label {
     #login a:hover, #sign-up a:hover {
       text-decoration: none;
       color: #180853; }
+
+#all-forms {
+  padding-top: 30px; }
+  #all-forms .item {
+    padding-left: 30px;
+    color: #180853; }
+    #all-forms .item .heavy-text {
+      font-size: 1.3em; }
+    #all-forms .item .light-text {
+      font-size: 1em; }
+
+#single-form {
+  padding-top: 30px;
+  text-align: center; }
+
+#my-data {
+  padding-top: 30px; }
 
 [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
   display: none !important; }
@@ -151,6 +169,28 @@ html, body, h1, h2, h3, h4, h5, h6, input {
   position: relative;
   width: 200px;
   margin-bottom: 30px; }
+
+.big-query {
+  background-color: #d8d8e4;
+  padding: 15px 30px; }
+  .big-query input {
+    margin-bottom: 0;
+    font-weight: 300;
+    border: none;
+    padding-left: 2px; }
+
+.small-query {
+  background-color: #b8b9cd;
+  font-size: 2em;
+  font-weight: 400;
+  padding: 15px 30px;
+  margin-bottom: 30px;
+  color: #180853; }
+
+input[type="submit"].submit {
+  font-size: 3em;
+  border: none;
+  color: #180853; }
 
 sidemenu {
   width: 100%; }
