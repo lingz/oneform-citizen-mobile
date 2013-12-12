@@ -65,81 +65,20 @@
         }
       };
       $scope.signIn = function(user, email, secret) {
-        var loadMessage, originalData, success;
+        var loadMessage;
         console.log(email);
         console.log(secret);
         console.log(user);
         console.log("authenticating3");
-        if ((email != null) && (secret != null)) {
-          console.log("authenticating2");
-          originalData = {
-            email: email,
-            secret: secret
-          };
-        } else {
-          originalData = {
+        if (!((email != null) && (secret != null))) {
+          ({
             email: user.email.value,
             secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
-          };
+          });
         }
-        console.log("success here!kjhx;");
         loadMessage = $scope.loadingMessage ? $scope.loadingMessage : "Loading...";
         $rootScope.startLoad(loadMessage);
-        success = function(data, status, headers, config) {
-          var successFields, successForms;
-          localStorageService.add('email', originalData["email"]);
-          localStorageService.add('secret', originalData["secret"]);
-          if (data.result != null) {
-            console.log("user");
-            console.log(User);
-            console.log("data");
-            console.log(data.result);
-            User.data = data.result;
-            User.data['secret'] = secret;
-            User.authenticated = true;
-            successForms = function(data, status, headers, config) {
-              var form, formData, _i, _len, _ref;
-              if (data.result != null) {
-                console.log("success here!kjhx;");
-                console.log(data.result);
-                formsService.orderedData = data.result;
-                formData = {};
-                $rootScope.appReady();
-                $location.path("/all_forms");
-                $rootScope.stopLoad();
-                raise_error_message("Login Successful");
-                _ref = data.result;
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  form = _ref[_i];
-                  formData[form._id] = form;
-                }
-                return formsService.data = formData;
-              }
-            };
-            make_request("/forms", "GET", null, successForms);
-            successFields = function(data, status, headers, config) {
-              var field, fieldData, _i, _len, _ref;
-              if (data.result != null) {
-                console.log(data.result);
-                fieldData = {};
-                _ref = data.result;
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  field = _ref[_i];
-                  fieldData[field._id] = field;
-                }
-                fieldsService.data = fieldData;
-                return $rootScope.$apply();
-              }
-            };
-            return make_request("/fields", "GET", null, successFields);
-          } else {
-            raise_error_message("Incorrect email & password combination");
-            localStorageService.clearAll();
-            User.authenticated = false;
-            return $rootScope.stopLoad();
-          }
-        };
-        return make_request("/auth/users", "POST", originalData, success);
+        return $rootScope.updateUser(email, secret);
       };
       local = {};
       local['email'] = localStorageService.get('email');
@@ -220,9 +159,10 @@
   ]);
 
   app1.controller("FormController", [
-    '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', function($scope, $routeParams, User, formsService, fieldsService) {
+    '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope', function($scope, $routeParams, User, formsService, fieldsService, $rootScope) {
       var field_id, _i, _len, _ref;
       $scope.current_form_id = $routeParams._id;
+      $scope.current_form = formsService['data'][$scope.current_form_id];
       console.log("scope._id, formsService, fieldsService");
       console.log($scope.current_form_id);
       console.log(formsService);
@@ -261,26 +201,37 @@
             console.log(data);
             route = "/users/" + User['data']['_id'] + "/data";
             success = function(data, textStatus, jqXHR) {
+              var dataOrgs, orgsRoute;
               console.log("data result");
-              console.log(data);
+              $scope.lastData = data;
               if (data.status !== 200) {
                 succesfullUpload = false;
               }
               $scope.status = "confirmed";
-              return console.log("success");
+              console.log("ORGSS");
+              console.log($scope.lastData);
+              console.log($scope.lastData['result']);
+              orgsRoute = "/users/" + User['data']['_id'] + "/data/" + $scope.lastData['result']['_id'] + "/orgs";
+              dataOrgs = {
+                _id: User['data']['_id'],
+                secret: User['data']['secret'],
+                orgs: $scope.current_form['orgs']
+              };
+              make_request(orgsRoute, "POST", dataOrgs, success);
+              return console.log("ORGSS DONE");
             };
             make_request(route, "POST", data, success);
           }
           if (succesfullUpload === true) {
             console.log("form:!@");
-            console.log($scope.current_form_id);
+            console.log($scope.current_form);
             routeForm = "/users/" + User['data']['_id'] + "/forms";
             dataForm = {
               _id: User['data']['_id'],
               secret: User['data']['secret'],
               formId: $scope.current_form_id
             };
-            return make_request(routeForm, "POST", data, success);
+            return make_request(routeForm, "POST", dataForm, success);
           } else {
             raise_error_message("Error uploading form");
             return $rootScope.stopLoad();
@@ -306,12 +257,85 @@
 
   app1.controller("MyDataController", [
     '$scope', 'User', 'fieldsService', function($scope, User, fieldsService) {
-      console.log("Fields Service");
-      console.log(fieldsService);
-      console.log("USER");
+      var key, mydata, value, _ref, _ref1;
       console.log(User);
-      $scope.myUser = $scope.User;
-      return $scope.myfields = $scope.fieldsService;
+      mydata = {
+        'profile': [],
+        'data': []
+      };
+      console.log("MYUSER");
+      console.log(User);
+      _ref = User['data']['profile'];
+      for (key in _ref) {
+        value = _ref[key];
+        mydata['profile'].push({
+          name: key,
+          value: value
+        });
+      }
+      _ref1 = User['data']['data'];
+      for (key in _ref1) {
+        value = _ref1[key];
+        mydata['data'].push({
+          name: fieldsService['data'][key]['name'],
+          value: value['value'],
+          access: value['access']
+        });
+      }
+      $scope.mydata = mydata;
+      console.log("MYDATA");
+      console.log($scope.mydata);
+      return console.log(fieldsService);
+    }
+  ]);
+
+  app1.controller("MyFormsController", [
+    '$scope', 'User', 'fieldsService', 'fieldsService', function($scope, User, fieldsService, formsService) {
+      var key, mydata, value, _ref, _ref1;
+      console.log(User);
+      mydata = {
+        'profile': [],
+        'data': []
+      };
+      console.log("MYUSER");
+      console.log(User);
+      _ref = User['data']['profile'];
+      for (key in _ref) {
+        value = _ref[key];
+        mydata['profile'].push({
+          name: key,
+          value: value
+        });
+      }
+      _ref1 = User['data']['data'];
+      for (key in _ref1) {
+        value = _ref1[key];
+        mydata['data'].push({
+          name: fieldsService['data'][key]['name'],
+          value: value['value'],
+          access: value['access']
+        });
+      }
+      $scope.mydata = mydata;
+      console.log("MYDATA");
+      console.log($scope.mydata);
+      return console.log(fieldsService);
+    }
+  ]);
+
+  app1.controller("IndexController", [
+    '$rootscope', 'User', function($rootscope, User) {
+      var onRefresh;
+      $scope.status = "Pull to reload";
+      return onRefresh = function() {
+        var email, secret;
+        $scope.status = "Refreshing";
+        if (User.authenticated != null) {
+          email = User.profile.email;
+          secret = User.secret;
+          return $rootScope.updateUser(email, secret);
+        }
+      };
     }
   ]);
 
