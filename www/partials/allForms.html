@@ -1,11 +1,8 @@
 <div id="all-forms" class="list">
-  <div class="big-query item">
-    <input ng-model="query.value" placeholder="Search">
-  </div>
+  <big-query field="query"></big-query>
   <div class="small-query">
     All Forms
   </div>
-
   <ul decorations:"none">
     <li ng-repeat="form in forms | filter:query.value" style="list-style-type: none">
       <a class="item" href="#/form/{{form._id}}">

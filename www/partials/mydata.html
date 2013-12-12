@@ -1,10 +1,10 @@
 <div id="my-data" class="list">
-  <div class="small-query">My Data</div>
+<div class="small-query">My Data</div>
 <form novalidate class="simple-form" id="single-form">
   <ol>
-    <input-field ng-repeat="data in mydata['profile']" field="data[1]">
+    <input-field ng-repeat="data in mydata['profile']" field="data">
     </input-field>
-    <input-field ng-repeat="data in mydata['data']" field="data[1]">
+    <input-field ng-repeat="data in mydata['data']" field="data">
     </input-field>
   </ol>
   <input type="submit" value="Update Data" class="medium-text submit">

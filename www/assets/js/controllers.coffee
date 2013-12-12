@@ -163,7 +163,6 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
         $location.replace()
         $rootScope.appUnready()
         $rootScope.stopLoad()
-        $rootScope.$apply()
       make_request("/users", "POST", originalData, success)
     else
       raise_error_message("Required fields missing")
@@ -243,9 +242,9 @@ app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', ($scope,
     console.log ("MYUSER")
     console.log (fieldsService)
     for key, value of User['data']['profile']
-      mydata['profile'].push([key,value])
+      mydata['profile'].push({name: key, value:value})
     for key, value of User['data']['data']
-      mydata['data'].push([fieldsService['data'][key]['name'],value['value']])
+      mydata['data'].push({name:fieldsService['data'][key]['name'], value: value['value']})
     $scope.mydata = mydata
     console.log ($scope.mydata)
     console.log (fieldsService)

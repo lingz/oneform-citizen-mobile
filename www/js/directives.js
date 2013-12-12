@@ -69,4 +69,20 @@
     };
   });
 
+  app1.directive("bigQuery", function() {
+    return {
+      restrict: "E",
+      templateUrl: "partials/big-query.html",
+      scope: {
+        fieldInfo: "=field",
+        keyup: "&"
+      },
+      link: function(scope, element, attrs) {
+        return scope.keyup = function($event) {
+          return scope.fieldInfo.value = element.find("input").val();
+        };
+      }
+    };
+  });
+
 }).call(this);

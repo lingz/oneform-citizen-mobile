@@ -198,8 +198,7 @@
             $location.path("/forms");
             $location.replace();
             $rootScope.appUnready();
-            $rootScope.stopLoad();
-            return $rootScope.$apply();
+            return $rootScope.stopLoad();
           };
           return make_request("/users", "POST", originalData, success);
         } else {
@@ -306,12 +305,18 @@
       _ref = User['data']['profile'];
       for (key in _ref) {
         value = _ref[key];
-        mydata['profile'].push([key, value]);
+        mydata['profile'].push({
+          name: key,
+          value: value
+        });
       }
       _ref1 = User['data']['data'];
       for (key in _ref1) {
         value = _ref1[key];
-        mydata['data'].push([fieldsService['data'][key]['name'], value['value']]);
+        mydata['data'].push({
+          name: fieldsService['data'][key]['name'],
+          value: value['value']
+        });
       }
       $scope.mydata = mydata;
       console.log($scope.mydata);
