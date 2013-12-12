@@ -27,6 +27,7 @@
       $scope.loadingMessage = "oneForm";
       $scope.$on("$routeChangeSuccess", function() {
         console.log("running");
+        $scope.$broadcast('scroll.resize');
         return $scope.closeLeft();
       });
       $rootScope.startLoad = function(loadingMessage) {

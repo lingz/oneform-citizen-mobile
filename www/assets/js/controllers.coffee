@@ -19,6 +19,7 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
   $scope.loadingMessage = "oneForm"
   $scope.$on("$routeChangeSuccess", () ->
     console.log("running")
+    $scope.$broadcast('scroll.resize')
     $scope.closeLeft()
   )
   $rootScope.startLoad = (loadingMessage) ->
