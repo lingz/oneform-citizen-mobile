@@ -34,6 +34,7 @@
         return $scope.loadingMessage = loadingMessage ? loadingMessage : "Loading...";
       };
       $rootScope.stopLoad = function() {
+        $scope.appLoaded = true;
         $scope.isLoading = false;
         $scope.loadingMessage = "Loading...";
         return $rootScope.$apply();
@@ -132,6 +133,8 @@
             return make_request("/fields", "GET", null, successFields);
           } else {
             raise_error_message("Incorrect email & password combination");
+            localStorageService.clearAll();
+            User.authenticated = false;
             return $rootScope.stopLoad();
           }
         };
@@ -182,7 +185,13 @@
         }
       };
       return $scope.signUp = function(user) {
-        var originalData, success;
+        var k, originalData, success, v;
+        for (k in user) {
+          v = user[k];
+          user[k] = v.value;
+        }
+        console.log("creating user");
+        console.log(user);
         console.log($scope.signUpForm.$valid);
         $rootScope.startLoad("Creating Account...");
         if ($scope.signUpForm.$valid) {
@@ -195,10 +204,10 @@
             localStorageService.add('email', originalData["email"]);
             localStorageService.add('secret', originalData["secret"]);
             console.log("added to localStorageService");
-            $location.path("/forms");
+            $location.path("/sign_in");
             $location.replace();
             $rootScope.appUnready();
-            return $rootScope.stopLoad();
+            return $rootScope.$apply();
           };
           return make_request("/users", "POST", originalData, success);
         } else {

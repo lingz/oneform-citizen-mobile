@@ -26,6 +26,7 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
     $scope.loadingMessage = if loadingMessage then loadingMessage else "Loading..."
 
   $rootScope.stopLoad = () ->
+    $scope.appLoaded = true
     $scope.isLoading = false
     $scope.loadingMessage = "Loading..."
     $rootScope.$apply()
@@ -105,6 +106,8 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
         make_request("/fields", "GET", null, successFields)
       else
         raise_error_message("Incorrect email & password combination")
+        localStorageService.clearAll()
+        User.authenticated = false
         $rootScope.stopLoad()
 
     make_request("/auth/users", "POST", originalData, success)
@@ -147,6 +150,10 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
       id: "password"
 
   $scope.signUp = (user) ->
+    for k, v of user
+      user[k] = v.value
+    console.log("creating user")
+    console.log(user)
     console.log($scope.signUpForm.$valid)
     $rootScope.startLoad("Creating Account...")
     if $scope.signUpForm.$valid
@@ -159,10 +166,10 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
         localStorageService.add('email', originalData["email"])
         localStorageService.add('secret', originalData["secret"])
         console.log("added to localStorageService")
-        $location.path("/forms")
+        $location.path("/sign_in")
         $location.replace()
         $rootScope.appUnready()
-        $rootScope.stopLoad()
+        $rootScope.$apply()
       make_request("/users", "POST", originalData, success)
     else
       raise_error_message("Required fields missing")

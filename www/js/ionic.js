@@ -1,35 +1,35 @@
 /*!
  * Copyright 2013 Drifty Co.
  * http://drifty.com/
-
- * Ionic - a powerful HTML5 mobile app framework.
+ *
+ * Ionic, v0.9.14
+ * A powerful HTML5 mobile app framework.
  * http://ionicframework.com/
  *
  * By @maxlynch, @helloimben, @adamdbradley <3
  *
  * Licensed under the MIT license. Please see LICENSE for more information.
  *
- */
-;
+ */;
 
 // Create namespaces 
 window.ionic = {
   controllers: {},
-  views: {}
-};
-;
+  views: {},
+  version: '0.9.14'
+};;
 (function(ionic) {
 
   var bezierCoord = function (x,y) {
-    if(!x) var x=0;
-    if(!y) var y=0;
+    if(!x) x=0;
+    if(!y) y=0;
     return {x: x, y: y};
-  }
+  };
 
-  function B1(t) { return t*t*t }
-  function B2(t) { return 3*t*t*(1-t) }
-  function B3(t) { return 3*t*(1-t)*(1-t) }
-  function B4(t) { return (1-t)*(1-t)*(1-t) }
+  function B1(t) { return t*t*t; }
+  function B2(t) { return 3*t*t*(1-t); }
+  function B3(t) { return 3*t*(1-t)*(1-t); }
+  function B4(t) { return (1-t)*(1-t)*(1-t); }
 
   ionic.Animator = {
     // Quadratic bezier solver
@@ -84,7 +84,7 @@ window.ionic = {
           if (Math.abs(x2 - x) < epsilon) return curveY(t2);
           if (x > x2) t0 = t2;
           else t1 = t2;
-          t2 = (t1 - t0) * .5 + t0;
+          t2 = (t1 - t0) * 0.5 + t0;
         }
 
         // Failure
@@ -154,7 +154,7 @@ window.ionic = {
           };
         }
       }
-      return null
+      return null;
     },
 
     getChildIndex: function(element, type) {
@@ -293,7 +293,7 @@ window.ionic = {
   // Map some convenient top-level functions for event handling
   ionic.on = function() { ionic.EventController.on.apply(ionic.EventController, arguments); };
   ionic.off = function() { ionic.EventController.off.apply(ionic.EventController, arguments); };
-  ionic.trigger = function() { ionic.EventController.trigger.apply(ionic.EventController.trigger, arguments); };
+  ionic.trigger = ionic.EventController.trigger;//function() { ionic.EventController.trigger.apply(ionic.EventController.trigger, arguments); };
   ionic.onGesture = function() { return ionic.EventController.onGesture.apply(ionic.EventController.onGesture, arguments); };
   ionic.offGesture = function() { return ionic.EventController.offGesture.apply(ionic.EventController.offGesture, arguments); };
 
@@ -1736,10 +1736,19 @@ window.ionic = {
 
       this._checkPlatforms(platforms);
 
-      for(var i = 0; i < platforms.length; i++) {
-        document.body.classList.add('platform-' + platforms[i]);
-      }
+      var classify = function() {
+        if(!document.body) { return; }
 
+        for(var i = 0; i < platforms.length; i++) {
+          document.body.classList.add('platform-' + platforms[i]);
+        }
+      };
+
+      document.addEventListener( "DOMContentLoaded", function(){
+        classify();
+      });
+
+      classify();
     },
     _checkPlatforms: function(platforms) {
       if(this.isCordova()) {
@@ -1747,6 +1756,12 @@ window.ionic = {
       }
       if(this.isIOS7()) {
         platforms.push('ios7');
+      }
+      if(this.isIPad()) {
+        platforms.push('ipad');
+      }
+      if(this.isAndroid()) {
+        platforms.push('android');
       }
     },
 
@@ -1757,11 +1772,20 @@ window.ionic = {
       //&& /^file:\/{3}[^\/]/i.test(window.location.href) 
       //&& /ios|iphone|ipod|ipad|android/i.test(navigator.userAgent);
     },
+    isIPad: function() {
+      return navigator.userAgent.toLowerCase().indexOf('ipad') >= 0;
+    },
     isIOS7: function() {
       if(!window.device) {
         return false;
       }
       return parseFloat(window.device.version) >= 7.0;
+    },
+    isAndroid: function() {
+      if(!window.device) {
+        return navigator.userAgent.toLowerCase().indexOf('android') >= 0;
+      }
+      return device.platform === "Android";
     }
   };
 
@@ -1800,8 +1824,16 @@ window.ionic = {
 
   // polyfill use to simulate native "tap"
   function inputTapPolyfill(ele, e) {
-    if(ele.type === "radio" || ele.type === "checkbox") {
-      //ele.checked = !ele.checked;
+    if(ele.type === "radio") {
+      ele.checked = !ele.checked;
+      ionic.trigger('click', {
+        target: ele
+      });
+    } else if(ele.type === "checkbox") {
+      ele.checked = !ele.checked;
+      ionic.trigger('change', {
+        target: ele
+      });
     } else if(ele.type === "submit" || ele.type === "button") {
       ionic.trigger('click', {
         target: ele
@@ -2316,8 +2348,9 @@ var Scroller;
 	/**
 	 * A pure logic 'component' for 'virtual' scrolling/zooming.
 	 */
-	ionic.views.Scroll = ionic.views.View.inherit({
-    initialize: function(options) {
+ionic.views.Scroll = ionic.views.View.inherit({
+  initialize: function(options) {
+    var self = this;
 
     this.__container = options.el;
     this.__content = options.el.firstElementChild;
@@ -2327,9 +2360,15 @@ var Scroller;
 
 			/** Disable scrolling on x-axis by default */
 			scrollingX: false,
+      scrollbarX: true,
 
 			/** Enable scrolling on y-axis */
 			scrollingY: true,
+      scrollbarY: true,
+
+      /** The minimum size the scrollbars scale to while scrolling */
+      minScrollbarSizeX: 5,
+      minScrollbarSizeY: 5,
 
 			/** Enable animations for deceleration, snap back, zooming and scrolling */
 			animating: true,
@@ -2367,21 +2406,44 @@ var Scroller;
 			scrollingComplete: NOOP,
 			
 			/** This configures the amount of change applied to deceleration when reaching boundaries  **/
-            penetrationDeceleration : 0.03,
+      penetrationDeceleration : 0.03,
 
-            /** This configures the amount of change applied to acceleration when reaching boundaries  **/
-            penetrationAcceleration : 0.08
+      /** This configures the amount of change applied to acceleration when reaching boundaries  **/
+      penetrationAcceleration : 0.08,
 
+      // The ms interval for triggering scroll events
+      scrollEventInterval: 50
 		};
 
 		for (var key in options) {
 			this.options[key] = options[key];
 		}
 
+    this.hintResize = ionic.debounce(function() {
+      self.resize();
+    }, 1000, true);
+
+    this.triggerScrollEvent = ionic.throttle(function() {
+      ionic.trigger('scroll', {
+        scrollTop: self.__scrollTop,
+        scrollLeft: self.__scrollLeft,
+        target: self.__container
+      });
+    }, this.options.scrollEventInterval);
+
+    this.triggerScrollEndEvent = function() {
+      ionic.trigger('scrollend', {
+        scrollTop: self.__scrollTop,
+        scrollLeft: self.__scrollLeft,
+        target: self.__container
+      });
+    };
+
     // Get the render update function, initialize event handlers,
     // and calculate the size of the scroll container
 		this.__callback = this.getRenderFn();
     this.__initEventHandlers();
+    this.__createScrollbars();
     this.resize();
 	},
 
@@ -2544,6 +2606,18 @@ var Scroller;
   __decelerationVelocityY: null,
 
 
+  /** {String} the browser-specific property to use for transforms */
+  __transformProperty: null,
+  __perspectiveProperty: null,
+
+  /** {Object} scrollbar indicators */
+  __indicatorX: null,
+  __indicatorY: null,
+
+  /** {Boolean} whether we've tried to wait for size already */
+  __didWaitForSize: null,
+  __sizerTimeout: null,
+
   __initEventHandlers: function() {
     var self = this;
 
@@ -2617,18 +2691,169 @@ var Scroller;
     }
   },
 
+  /** Create a scroll bar div with the given direction **/
+  __createScrollbar: function(direction) {
+    var bar = document.createElement('div'),
+      indicator = document.createElement('div');
+
+    indicator.className = 'scroll-bar-indicator';
+
+    if(direction == 'h') {
+      bar.className = 'scroll-bar scroll-bar-h';
+    } else {
+      bar.className = 'scroll-bar scroll-bar-v';
+    }
+
+    bar.appendChild(indicator);
+    return bar;
+  },
+
+  __createScrollbars: function() {
+    var indicatorX, indicatorY;
+
+    if(this.options.scrollingX) {
+      indicatorX = {
+        el: this.__createScrollbar('h'),
+        sizeRatio: 1
+      };
+      indicatorX.indicator = indicatorX.el.children[0];
+
+      if(this.options.scrollbarX) {
+        this.__container.appendChild(indicatorX.el);
+      }
+      this.__indicatorX = indicatorX;
+    }
+
+    if(this.options.scrollingY) {
+      indicatorY = {
+        el: this.__createScrollbar('v'),
+        sizeRatio: 1
+      };
+      indicatorY.indicator = indicatorY.el.children[0];
+
+      if(this.options.scrollbarY) {
+        this.__container.appendChild(indicatorY.el);
+      }
+      this.__indicatorY = indicatorY;
+    }
+  },
+
+  __resizeScrollbars: function() {
+    var self = this;
+
+    // Update horiz bar
+    if(self.__indicatorX) {
+      var width = Math.max(Math.round(self.__clientWidth * self.__clientWidth / (self.__contentWidth)), 20);
+      self.__indicatorX.size = width;
+      self.__indicatorX.minScale = this.options.minScrollbarSizeX / width;
+      self.__indicatorX.indicator.style.width = width + 'px';
+      self.__indicatorX.maxPos = self.__clientWidth - width;
+      self.__indicatorX.sizeRatio = self.__maxScrollLeft ? self.__indicatorX.maxPos / self.__maxScrollLeft : 1;
+    }
+
+    // Update vert bar
+    if(self.__indicatorY) {
+      var height = Math.max(Math.round(self.__clientHeight * self.__clientHeight / (self.__contentHeight)), 20);
+      self.__indicatorY.size = height;
+      self.__indicatorY.minScale = this.options.minScrollbarSizeY / height;
+      self.__indicatorY.maxPos = self.__clientHeight - height;
+      self.__indicatorY.indicator.style.height = height + 'px';
+      self.__indicatorY.sizeRatio = self.__maxScrollTop ? self.__indicatorY.maxPos / self.__maxScrollTop : 1;
+    }
+  },
+
+  /**
+   * Move and scale the scrollbars as the page scrolls.
+   */
+  __repositionScrollbars: function() {
+    var self = this, width, heightScale, widthDiff, heightDiff, x, y;
+
+    if(self.__indicatorX) {
+      // Handle the X scrollbar
+
+      x = Math.round(self.__indicatorX.sizeRatio * self.__scrollLeft) || 0,
+
+      // The the difference between the last content X position, and our overscrolled one
+      widthDiff = self.__scrollLeft - self.__maxScrollLeft;
+
+      if(self.__scrollLeft < 0) {
+
+        widthScale = Math.max(self.__indicatorX.minScale,
+            (self.__indicatorX.size - Math.abs(self.__scrollLeft)) / self.__indicatorX.size);
+
+        // Stay at left
+        x = 0;
+
+        // Make sure scale is transformed from the left/center origin point
+        self.__indicatorX.indicator.style[self.__transformOriginProperty] = 'left center';
+      } else if(widthDiff > 0) {
+
+        widthScale = Math.max(self.__indicatorX.minScale,
+            (self.__indicatorX.size - widthDiff) / self.__indicatorX.size);
+
+        // Stay at the furthest x for the scrollable viewport
+        x = self.__indicatorX.maxPos;
+
+        // Make sure scale is transformed from the right/center origin point
+        self.__indicatorX.indicator.style[self.__transformOriginProperty] = 'right center';
+
+      } else {
+
+        // Normal motion
+        x = Math.min(self.__maxScrollLeft, Math.max(0, x));
+        widthScale = 1;
+
+      }
+
+      self.__indicatorX.indicator.style[self.__transformProperty] = 'translate3d(' + x + 'px, 0, 0) scaleX(' + widthScale + ')';
+    }
+
+    if(self.__indicatorY) {
+
+      y = Math.round(self.__indicatorY.sizeRatio * self.__scrollTop) || 0;
+
+      heightDiff = self.__scrollTop - self.__maxScrollTop;
+
+      if(self.__scrollTop < 0) {
+
+        heightScale = Math.max(self.__indicatorY.minScale, (self.__indicatorY.size - Math.abs(self.__scrollTop)) / self.__indicatorY.size);
+
+        // Stay at top
+        y = 0;
+
+        // Make sure scale is transformed from the center/top origin point
+        self.__indicatorY.indicator.style[self.__transformOriginProperty] = 'center top';
+
+      } else if(heightDiff > 0) {
+
+        heightScale = Math.max(self.__indicatorY.minScale, (self.__indicatorY.size - heightDiff) / self.__indicatorY.size);
+
+        // Stay at bottom of scrollable viewport
+        y = self.__indicatorY.maxPos;
+
+        // Make sure scale is transformed from the center/bottom origin point
+        self.__indicatorY.indicator.style[self.__transformOriginProperty] = 'center bottom';
+
+      } else {
+
+        // Normal motion
+        y = Math.min(self.__maxScrollTop, Math.max(0, y));
+        heightScale = 1;
+
+      }
+
+      self.__indicatorY.indicator.style[self.__transformProperty] = 'translate3d(0,' + y + 'px, 0) scaleY(' + heightScale + ')';
+    }
+  },
 
   resize: function() {
     // Update Scroller dimensions for changed content
     // Add padding to bottom of content
-    var self = this;
-    setTimeout(function() {
-      self.setDimensions(
-    	Math.min(self.__container.clientWidth, self.__container.parentElement.clientWidth), 
-    	Math.min(self.__container.clientHeight, self.__container.parentElement.clientHeight), 
-    	self.__content.offsetWidth, 
-    	self.__content.offsetHeight-20);
-    }, 1000); 
+    this.setDimensions(
+    	this.__container.clientWidth,
+    	this.__container.clientHeight,
+    	Math.max(this.__content.scrollWidth, this.__content.offsetWidth),
+    	Math.max(this.__content.scrollHeight, this.__content.offsetHeight+20));
   },
   /*
   ---------------------------------------------------------------------------
@@ -2637,6 +2862,8 @@ var Scroller;
   */
 
   getRenderFn: function() {
+    var self = this;
+
     var content = this.__content;
 
 	  var docStyle = document.documentElement.style;
@@ -2662,17 +2889,26 @@ var Scroller;
 
     var perspectiveProperty = vendorPrefix + "Perspective";
     var transformProperty = vendorPrefix + "Transform";
+    var transformOriginProperty = vendorPrefix + 'TransformOrigin';
+
+    self.__perspectiveProperty = transformProperty;
+    self.__transformProperty = transformProperty;
+    self.__transformOriginProperty = transformOriginProperty;
     
     if (helperElem.style[perspectiveProperty] !== undef) {
       
       return function(left, top, zoom) {
-        content.style[transformProperty] = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0) scale(' + zoom + ')';
+        content.style[transformProperty] = 'translate3d(' + (-left) + 'px,' + (-top) + 'px,0)';
+        self.__repositionScrollbars();
+        self.triggerScrollEvent();
       };	
       
     } else if (helperElem.style[transformProperty] !== undef) {
       
       return function(left, top, zoom) {
-        content.style[transformProperty] = 'translate(' + (-left) + 'px,' + (-top) + 'px) scale(' + zoom + ')';
+        content.style[transformProperty] = 'translate(' + (-left) + 'px,' + (-top) + 'px)';
+        self.__repositionScrollbars();
+        self.triggerScrollEvent();
       };
       
     } else {
@@ -2681,6 +2917,8 @@ var Scroller;
         content.style.marginLeft = left ? (-left/zoom) + 'px' : '';
         content.style.marginTop = top ? (-top/zoom) + 'px' : '';
         content.style.zoom = zoom || '';
+        self.__repositionScrollbars();
+        self.triggerScrollEvent();
       };
       
     }
@@ -2698,6 +2936,7 @@ var Scroller;
    * @param contentHeight {Integer ? null} Outer height of inner element
    */
   setDimensions: function(clientWidth, clientHeight, contentWidth, contentHeight) {
+
     var self = this;
 
     // Only update values which are defined
@@ -2719,6 +2958,7 @@ var Scroller;
 
     // Refresh maximums
     self.__computeScrollMax();
+    self.__resizeScrollbars();
 
     // Refresh scroll position
     self.scrollTo(self.__scrollLeft, self.__scrollTop, true);
@@ -3052,6 +3292,7 @@ var Scroller;
    * Touch start handler for scrolling support
    */
   doTouchStart: function(touches, timeStamp) {
+    this.hintResize();
 
     // Array-like check is enough here
     if (touches.length == null) {
@@ -3522,7 +3763,6 @@ var Scroller;
       self.__scheduledTop = self.__scrollTop = top;
       self.__scheduledZoom = self.__zoomLevel = zoom;
 
-
       // Push values out
       if (self.__callback) {
         self.__callback(left, top, zoom);
@@ -3550,9 +3790,29 @@ var Scroller;
     self.__maxScrollLeft = Math.max((self.__contentWidth * zoomLevel) - self.__clientWidth, 0);
     self.__maxScrollTop = Math.max((self.__contentHeight * zoomLevel) - self.__clientHeight, 0);
 
+    if(!self.__didWaitForSize && self.__maxScrollLeft == 0 && self.__maxScrollTop == 0) {
+      self.__didWaitForSize = true;
+      self.__waitForSize();
+    }
   },
 
 
+  /**
+   * If the scroll view isn't sized correctly on start, wait until we have at least some size
+   */
+  __waitForSize: function() {
+
+    var self = this;
+
+    clearTimeout(self.__sizerTimeout);
+    self.__sizerTimeout = setTimeout(function sizer() {
+      self.resize();
+      if(self.__maxScrollLeft == 0 && self.__maxScrollTop == 0) {
+        self.__sizerTimeout = setTimeout(sizer, 1000);
+      }
+    }, 1000);
+
+  },
 
   /*
   ---------------------------------------------------------------------------
@@ -5472,6 +5732,10 @@ ionic.controllers.NavController = ionic.controllers.ViewController.inherit({
       return amount / this.right.width;
     },
 
+    isOpen: function() {
+      return this.getOpenRatio() == 1;
+    },
+
     /**
      * @return {float} The percentage of open amount over menu width. For example, a
      * menu of width 100 open 50 pixels would be open 50%. Value is negative
@@ -5529,9 +5793,9 @@ ionic.controllers.NavController = ionic.controllers.ViewController.inherit({
         this._leftShowing = false;
 
         // Bring the z-index of the right menu up
-        this.right && this.right.bringUp();
+        this.right && this.right.bringUp && this.right.bringUp();
         // Push the z-index of the left menu down
-        this.left && this.left.pushDown();
+        this.left && this.left.pushDown && this.left.pushDown();
       }
     },
 
