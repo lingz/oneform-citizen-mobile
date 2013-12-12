@@ -7,6 +7,7 @@
 
   app1.controller("LogoutController", [
     '$scope', '$location', 'localStorageService', 'User', function($scope, $location, localStorageService, User) {
+      console.log("logging out");
       localStorageService.clearAll();
       User.authenticated = false;
       return $location.path("/sign_in");
@@ -151,7 +152,7 @@
           id: "email"
         },
         uniqueId: {
-          name: "UDID (Emirates Id)",
+          name: "UDID (Emirates Id Number)",
           id: "internalId"
         },
         password: {
@@ -187,13 +188,13 @@
   app1.controller("FormController", [
     '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', function($scope, $routeParams, User, formsService, fieldsService) {
       var field_id, _i, _len, _ref;
-      $scope._id = $routeParams._id;
+      $scope.current_form_id = $routeParams._id;
       console.log("scope._id, formsService, fieldsService");
-      console.log($scope._id);
+      console.log($scope.current_form_id);
       console.log(formsService);
       console.log(fieldsService);
       $scope.fields = [];
-      _ref = formsService.data[$scope._id].fields;
+      _ref = formsService.data[$scope.current_form_id].fields;
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         field_id = _ref[_i];
         $scope.fields.push(fieldsService.data[field_id]);
@@ -239,11 +240,13 @@
             make_request(route, "POST", data, success);
           }
           if (succesfullUpload === true) {
+            console.log("form:!@");
+            console.log($scope.current_form_id);
             routeForm = "/users/" + User['data']['_id'] + "/forms";
             dataForm = {
               _id: User['data']['_id'],
               secret: User['data']['secret'],
-              formId: $scope._id
+              formId: $scope.current_form_id
             };
             return make_request(routeForm, "POST", data, success);
           } else {
@@ -269,29 +272,12 @@
 
   app1.controller("MyDataController", [
     '$scope', 'User', 'fieldsService', function($scope, User, fieldsService) {
-      var key, mydata, value, _ref, _ref1;
-      console.log(User);
-      mydata = {
-        'profile': [],
-        'data': []
-      };
-      console.log("MYUSER");
+      console.log("Fields Service");
       console.log(fieldsService);
-      _ref = User['data']['profile'];
-      for (key in _ref) {
-        value = _ref[key];
-        mydata['profile'].push([key, value]);
-      }
-      _ref1 = User['data']['data'];
-      for (key in _ref1) {
-        value = _ref1[key];
-        console.log;
-        mydata['data'].push([fieldsService['data'][key]['name'], value['value']]);
-      }
-      $scope.mydata = mydata;
-      console.log("MYDATA2");
-      console.log($scope.mydata);
-      return console.log(fieldsService);
+      console.log("USER");
+      console.log(User);
+      $scope.myUser = $scope.User;
+      return $scope.myfields = $scope.fieldsService;
     }
   ]);
 

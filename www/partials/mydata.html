@@ -1,10 +1,10 @@
 Profile
-<div ng-repeat="data in mydata['profile']">
-	<h6>{{data[0]}}</h6>
-	<p>{{data[1]}}</p>
+<div ng-repeat="key in myUser['data']['profile']">
+	<h6>{{key}}</h6>
+	<input type>{{User['data']['profile'][key]}}</input>
 </div>
 Data
-<div ng-repeat="data in mydata['data']">
-	<h6>{{data[0]}}</h6>
-	<p>{{data[1]}}</p>
+<div ng-repeat="key in myUser['data']['data']">
+	<h6>{{myFields[key]['name']}}</h6>
+	<p>{{User['data']['data'][key]['value']}}</p>
 </div>

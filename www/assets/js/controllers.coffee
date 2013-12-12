@@ -146,13 +146,13 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', ($scop
 
 app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService',\
 ($scope, $routeParams, User, formsService, fieldsService)->
-  $scope._id = $routeParams._id
+  $scope.current_form_id = $routeParams._id
   console.log ("scope._id, formsService, fieldsService")
-  console.log($scope._id)
+  console.log($scope.current_form_id)
   console.log(formsService)
   console.log(fieldsService)
   $scope.fields = []
-  for field_id in formsService.data[$scope._id].fields
+  for field_id in formsService.data[$scope.current_form_id].fields
     $scope.fields.push(fieldsService.data[field_id])
   console.log($scope.fields)
 
@@ -188,11 +188,13 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
           console.log("success")
         make_request(route,"POST", data ,success) 
       if succesfullUpload == true
+        console.log ("form:!@")
+        console.log ($scope.current_form_id)
         routeForm = "/users/"+User['data']['_id']+"/forms"
         dataForm =
           _id: User['data']['_id']
           secret: User['data']['secret']
-          formId: $scope._id
+          formId: $scope.current_form_id
         make_request(routeForm,"POST", data, success)
       else
         raise_error_message("Error uploading form")
@@ -212,18 +214,19 @@ app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, for
 
 
 app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', ($scope, User, fieldsService) ->
+    console.log ("Fields Service")
+    console.log(fieldsService)
+    console.log("USER")
     console.log (User)
-    mydata = {'profile':[],'data':[]}
-    console.log ("MYUSER")
-    console.log (fieldsService)
-    for key, value of User['data']['profile']
-      mydata['profile'].push([key,value])
-    for key, value of User['data']['data']
-      console.log 
-      mydata['data'].push([fieldsService['data'][key]['name'],value['value']])
-    $scope.mydata = mydata
-    console.log ("MYDATA2")
-    console.log ($scope.mydata)
-    console.log (fieldsService)
+    $scope.myUser = $scope.User
+    $scope.myfields = $scope.fieldsService
+    # mydata = {'profile':[],'data':[]}
+    # console.log ("MYUSER")
+    # console.log (User["data"])
+    # for key, value of User['data']['profile']
+    #   mydata['profile'].push([key,value])
+    # for key, value of User['data']['data']
+    #   console.log 
+    #   mydata['data'].push([fieldsService['data'][key]['name'],value['value']])
 ]
 
