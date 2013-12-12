@@ -54,13 +54,9 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
       value: ""
 
   $scope.signIn = (user, email, secret) ->
-    console.log (email)
-    console.log (secret)
-    console.log(user)
-    console.log ("authenticating3")
     if not (email? and secret?)
-        email: user.email.value
-        secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
+      email = user.email.value
+      secret = CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
     loadMessage = if $scope.loadingMessage then $scope.loadingMessage else "Loading..."
     $rootScope.startLoad(loadMessage)
     $rootScope.updateUser(email, secret)

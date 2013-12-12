@@ -66,15 +66,9 @@
       };
       $scope.signIn = function(user, email, secret) {
         var loadMessage;
-        console.log(email);
-        console.log(secret);
-        console.log(user);
-        console.log("authenticating3");
         if (!((email != null) && (secret != null))) {
-          ({
-            email: user.email.value,
-            secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
-          });
+          email = user.email.value;
+          secret = CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString();
         }
         loadMessage = $scope.loadingMessage ? $scope.loadingMessage : "Loading...";
         $rootScope.startLoad(loadMessage);
