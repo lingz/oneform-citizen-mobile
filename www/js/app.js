@@ -9,11 +9,11 @@
 
   app.config([
     "$routeProvider", function($routeProvider) {
-      $routeProvider.when("/view1", {
-        templateUrl: "partials/input_fields.html",
-        controller: "MyCtrl1",
+      $routeProvider.when("/", {
+        templateUrl: "index.html",
+        controller: "IndexController",
         access: {
-          isFree: isDeveloper
+          isFree: true
         }
       });
       $routeProvider.when("/sign_in", {
@@ -58,17 +58,79 @@
     }
   ]);
 
-  app.run(function($rootScope, $location, User) {
-    var _this = this;
-    return $rootScope.$watch(function() {
-      return $location.path();
-    }, function(next, prev) {
-      if (!User.authenticated && $location.path().search("sign") === -1) {
-        console.log($location.path());
-        console.log("sending to sign in");
-        return $location.path("/sign_in");
-      }
-    });
-  });
+  app.run([
+    "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", function($rootScope, $location, User, fieldsService, formsService, localStorageService) {
+      var _this = this;
+      $rootScope.updateUser = function(email, secret) {
+        var data, success;
+        data = {
+          email: email,
+          secret: secret
+        };
+        success = function(data, status, headers, config) {
+          var successFields, successForms;
+          if (data.result != null) {
+            console.log("user");
+            console.log(User);
+            console.log("data");
+            console.log(data.result);
+            User.data = data.result;
+            User.data['secret'] = secret;
+            User.authenticated = true;
+            successForms = function(data, status, headers, config) {
+              var form, formData, _i, _len, _ref;
+              if (data.result != null) {
+                console.log("success here!kjhx;");
+                console.log(data.result);
+                formsService.orderedData = data.result;
+                formData = {};
+                $rootScope.appReady();
+                $location.path("/all_forms");
+                $rootScope.stopLoad();
+                raise_error_message("Login Successful");
+                _ref = data.result;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  form = _ref[_i];
+                  formData[form._id] = form;
+                }
+                return formsService.data = formData;
+              }
+            };
+            make_request("/forms", "GET", null, successForms);
+            successFields = function(data, status, headers, config) {
+              var field, fieldData, _i, _len, _ref;
+              if (data.result != null) {
+                console.log(data.result);
+                fieldData = {};
+                _ref = data.result;
+                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                  field = _ref[_i];
+                  fieldData[field._id] = field;
+                }
+                fieldsService.data = fieldData;
+                return $rootScope.$apply();
+              }
+            };
+            return make_request("/fields", "GET", null, successFields);
+          } else {
+            raise_error_message("Incorrect email & password combination");
+            localStorageService.clearAll();
+            User.authenticated = false;
+            return $rootScope.stopLoad();
+          }
+        };
+        return make_request("/auth/users", "POST", data, success);
+      };
+      return $rootScope.$watch(function() {
+        return $location.path();
+      }, function(next, prev) {
+        if (!User.authenticated && $location.path().search("sign") === -1) {
+          console.log($location.path());
+          console.log("sending to sign in");
+          return $location.path("/sign_in");
+        }
+      });
+    }
+  ]);
 
 }).call(this);

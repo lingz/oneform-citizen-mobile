@@ -8,11 +8,11 @@ app = angular.module("myApp", ["ionic", "myApp.filters", "myApp.services",
   "myApp.controllers", "myApp.directives", "ngRoute", "LocalStorageModule"])
 
 app.config ["$routeProvider", ($routeProvider) ->
-  $routeProvider.when "/view1",
-    templateUrl: "partials/input_fields.html"
-    controller: "MyCtrl1",
+  $routeProvider.when "/",
+    templateUrl: "index.html"
+    controller: "IndexController",
     access:
-      isFree: isDeveloper
+      isFree: true
 
   $routeProvider.when "/sign_in",
     templateUrl: "partials/sign_in.html"
@@ -46,7 +46,51 @@ app.config ["$routeProvider", ($routeProvider) ->
 
   $routeProvider.otherwise redirectTo: "/sign_in"]
 
-app.run ($rootScope, $location, User) ->
+app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService",\
+ ($rootScope, $location, User, fieldsService, formsService, localStorageService) ->
+  $rootScope.updateUser = (email, secret) ->
+    data =
+      email: email
+      secret: secret
+    success = (data, status, headers, config) ->
+      if data.result?
+        console.log ("user")
+        console.log(User)
+        console.log("data")
+        console.log (data.result)
+        User.data = data.result
+        User.data['secret'] = secret
+        User.authenticated = true
+        successForms = (data, status, headers, config) ->
+          if data.result?
+            console.log("success here!kjhx;")
+            console.log(data.result)
+            formsService.orderedData = data.result
+            formData = {}
+            $rootScope.appReady()
+            $location.path("/all_forms")
+            $rootScope.stopLoad()
+            raise_error_message("Login Successful")
+            for form in data.result
+              formData[form._id] = form
+            formsService.data = formData
+        make_request("/forms", "GET", null, successForms)
+        successFields = (data, status, headers, config) ->
+          if data.result?
+            console.log(data.result)
+            fieldData = {}
+            for field in data.result
+              fieldData[field._id] = field
+            fieldsService.data = fieldData
+            $rootScope.$apply()
+        make_request("/fields", "GET", null, successFields)
+      else
+        raise_error_message("Incorrect email & password combination")
+        localStorageService.clearAll()
+        User.authenticated = false
+        $rootScope.stopLoad()
+    make_request("/auth/users", "POST", data, success)
+  
   $rootScope.$watch(
     => $location.path(),
     (next, prev) ->
@@ -55,3 +99,4 @@ app.run ($rootScope, $location, User) ->
         console.log("sending to sign in")
         $location.path("/sign_in")
   )
+]

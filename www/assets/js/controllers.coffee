@@ -58,60 +58,12 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
     console.log (secret)
     console.log(user)
     console.log ("authenticating3")
-    if email? and secret?
-      console.log ("authenticating2")
-      originalData =
-        email: email
-        secret: secret
-    else
-      originalData =
+    if not (email? and secret?)
         email: user.email.value
         secret: CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
-
-    console.log("success here!kjhx;")
     loadMessage = if $scope.loadingMessage then $scope.loadingMessage else "Loading..."
     $rootScope.startLoad(loadMessage)
-    success = (data, status, headers, config) ->
-      localStorageService.add('email', originalData["email"])
-      localStorageService.add('secret', originalData["secret"])
-      if data.result?
-        console.log ("user")
-        console.log(User)
-        console.log("data")
-        console.log (data.result)
-        User.data = data.result
-        User.data['secret'] = secret
-        User.authenticated = true
-        successForms = (data, status, headers, config) ->
-          if data.result?
-            console.log("success here!kjhx;")
-            console.log(data.result)
-            formsService.orderedData = data.result
-            formData = {}
-            $rootScope.appReady()
-            $location.path("/all_forms")
-            $rootScope.stopLoad()
-            raise_error_message("Login Successful")
-            for form in data.result
-              formData[form._id] = form
-            formsService.data = formData
-        make_request("/forms", "GET", null, successForms)
-        successFields = (data, status, headers, config) ->
-          if data.result?
-            console.log(data.result)
-            fieldData = {}
-            for field in data.result
-              fieldData[field._id] = field
-            fieldsService.data = fieldData
-            $rootScope.$apply()
-        make_request("/fields", "GET", null, successFields)
-      else
-        raise_error_message("Incorrect email & password combination")
-        localStorageService.clearAll()
-        User.authenticated = false
-        $rootScope.stopLoad()
-
-    make_request("/auth/users", "POST", originalData, success)
+    $rootScope.updateUser(email, secret)
 
   local = {}
   local['email'] = localStorageService.get('email')
@@ -177,15 +129,16 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
       $rootScope.stopLoad()
 ]
 
-app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService',\
-($scope, $routeParams, User, formsService, fieldsService)->
-  $scope._id = $routeParams._id
+app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope',\
+($scope, $routeParams, User, formsService, fieldsService, $rootScope)->
+  $scope.current_form_id = $routeParams._id
+  $scope.current_form = formsService['data'][$scope.current_form_id]
   console.log ("scope._id, formsService, fieldsService")
-  console.log($scope._id)
+  console.log($scope.current_form_id)
   console.log(formsService)
   console.log(fieldsService)
   $scope.fields = []
-  for field_id in formsService.data[$scope._id].fields
+  for field_id in formsService.data[$scope.current_form_id].fields
     $scope.fields.push(fieldsService.data[field_id])
   console.log($scope.fields)
 
@@ -212,19 +165,32 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
         route = "/users/"+User['data']['_id']+"/data"
         success = (data,textStatus,jqXHR) ->
           console.log ("data result")
-          console.log (data)
+          $scope.lastData = data
           if data.status != 200
             succesfullUpload = false
           $scope.status = "confirmed"
-          console.log("success")
+          console.log ("ORGSS")
+          console.log ($scope.lastData)
+          console.log ($scope.lastData['result'])
+          orgsRoute = "/users/"+User['data']['_id']+"/data/"+$scope.lastData['result']['_id']+"/orgs"
+          dataOrgs = 
+            _id:User['data']['_id']
+            secret: User['data']['secret']
+            orgs:$scope.current_form['orgs']
+          make_request(orgsRoute,"POST",dataOrgs, success)
+          console.log ("ORGSS DONE")
+
+
         make_request(route,"POST", data ,success)
       if succesfullUpload == true
+        console.log ("form:!@")
+        console.log ($scope.current_form)
         routeForm = "/users/"+User['data']['_id']+"/forms"
         dataForm =
           _id: User['data']['_id']
           secret: User['data']['secret']
-          formId: $scope._id
-        make_request(routeForm,"POST", data, success)
+          formId: $scope.current_form_id
+        make_request(routeForm,"POST", dataForm, success)
       else
         raise_error_message("Error uploading form")
         $rootScope.stopLoad()
@@ -248,13 +214,38 @@ app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', ($scope,
     console.log (User)
     mydata = {'profile':[],'data':[]}
     console.log ("MYUSER")
-    console.log (fieldsService)
+    console.log (User)
     for key, value of User['data']['profile']
       mydata['profile'].push({name: key, value:value})
     for key, value of User['data']['data']
-      mydata['data'].push({name:fieldsService['data'][key]['name'], value: value['value']})
+      mydata['data'].push({name:fieldsService['data'][key]['name'], value: value['value'], access: value['access']})
     $scope.mydata = mydata
+    console.log ("MYDATA")
     console.log ($scope.mydata)
     console.log (fieldsService)
 ]
 
+app1.controller "MyFormsController", ['$scope', 'User', 'fieldsService', 'fieldsService', ($scope, User, fieldsService, formsService) ->
+    console.log (User)
+    mydata = {'profile':[],'data':[]}
+    console.log ("MYUSER")
+    console.log (User)
+    for key, value of User['data']['profile']
+      mydata['profile'].push({name: key, value:value})
+    for key, value of User['data']['data']
+      mydata['data'].push({name:fieldsService['data'][key]['name'], value: value['value'], access: value['access']})
+    $scope.mydata = mydata
+    console.log ("MYDATA")
+    console.log ($scope.mydata)
+    console.log (fieldsService)
+]
+
+app1.controller "IndexController", ['$rootscope', 'User', ($rootscope, User) ->
+  $scope.status = "Pull to reload"
+  onRefresh = ()->
+    $scope.status = "Refreshing"
+    if User.authenticated?
+      email = User.profile.email
+      secret = User.secret
+      $rootScope.updateUser(email,secret)
+]

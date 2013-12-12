@@ -26,3 +26,4 @@ window.raise_error_message = (error_str) ->
   setTimeout(() ->
     $("#errors").removeClass("raised")
   , 3000)
+
