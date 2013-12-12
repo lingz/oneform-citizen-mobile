@@ -64,7 +64,10 @@
         };
         console.log("attrs");
         console.log(attrs);
-        return scope.htmltype = attrs.htmltype;
+        scope.htmltype = attrs.htmltype;
+        scope.disabledstate = attrs.disabledstate;
+        console.log(scope.disabledstate);
+        return console.log(scope.htmltype);
       }
     };
   });

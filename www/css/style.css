@@ -153,8 +153,6 @@ input.empty + label {
 
 #single-form {
   padding-top: 30px; }
-  #single-form .submit-container {
-    text-align: center; }
 
 #my-data {
   padding-top: 30px; }
@@ -188,10 +186,15 @@ html, body, h1, h2, h3, h4, h5, h6, input {
   margin-bottom: 30px;
   color: #180853; }
 
-input[type="submit"].submit {
-  font-size: 3em;
+button.submit.button-clear.button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 2.6em;
   border: none;
-  color: #180853; }
+  padding: 0px;
+  margin: 10px 0px;
+  color: #180853 !important; }
 
 sidemenu {
   width: 100%; }
@@ -206,14 +209,14 @@ header.bar.bar-header {
     color: black;
     font-size: 4em; }
 
-a, input[type="submit"] {
+a, button.submit {
   opacity: 0.8;
   -webkit-transition: opacity 1s;
   -ms-transition: opacity 1s;
   -moz-transition: opacity 1s;
   -o-transition: opacity 1s;
   transition: opacity 1s; }
-  a:hover, input[type="submit"]:hover {
+  a:hover, button.submit:hover {
     opacity: 1; }
 
 .item {

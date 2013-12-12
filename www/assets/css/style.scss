@@ -50,10 +50,15 @@ $search-dark-blue: rgb(184,185,205);
   color: $dark-blue;
 }
 
-input[type="submit"].submit {
-  font-size: 3em;
+button.submit.button-clear.button {
+  display: block;
+  width: 100%;
+  text-align: center;
+  font-size: 2.6em;
   border: none;
-  color: $dark-blue
+  padding: 0px;
+  margin: 10px 0px;
+  color: $dark-blue !important;
 }
 
 sidemenu {
@@ -73,7 +78,7 @@ header.bar.bar-header {
   }
 }
 
-a, input[type="submit"] {
+a, button.submit {
   opacity: 0.8;
   @include vendor-prefix(transition, "opacity 1s");
   &:hover {
