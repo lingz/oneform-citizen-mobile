@@ -8,11 +8,6 @@ app = angular.module("myApp", ["ionic", "myApp.filters", "myApp.services",
   "myApp.controllers", "myApp.directives", "ngRoute", "LocalStorageModule"])
 
 app.config ["$routeProvider", ($routeProvider) ->
-  $routeProvider.when "/",
-    templateUrl: "index.html"
-    controller: "IndexController",
-    access:
-      isFree: true
 
   $routeProvider.when "/sign_in",
     templateUrl: "partials/sign_in.html"
@@ -118,7 +113,6 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         fieldsService.data = fieldData
         $rootScope.successCount += 1
         $rootScope.doneDownloading()
-
     $rootScope.doneDownloading = () ->
       if $rootScope.successCount == 3
         localStorageService.add('email', User.data.profile.email)
