@@ -42,7 +42,6 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
  'formsService', 'fieldsService','localStorageService',\
  ($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) ->
-
   $scope.signIn = (user, email, secret) ->
     if not (email? and secret?)
       email = user.email

@@ -46,13 +46,32 @@ app.config ["$routeProvider", ($routeProvider) ->
 
   $routeProvider.otherwise redirectTo: "/sign_in"]
 
-app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService",\
- ($rootScope, $location, User, fieldsService, formsService, localStorageService) ->
-  $rootScope.updateUser = (email, secret, successUpdate) ->
-    $rootScope.updateStatus = "start"
+app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService","$route",\
+ ($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) ->
+  $rootScope.updateUser = (userEmail, userSecret, userSuccessUpdate) ->  
+    successUpdate = () ->
+      if userSuccessUpdate?
+        userSuccessUpdate()
+      $rootScope.stopLoad()
+      $rootScope.$apply()
+      $route.reload()
+      console.log ("Done update")
+    
+    console.log ("LOCAL")
     data = 
-      email: email
-      secret: secret
+      email: localStorageService.get('email')
+      secret: localStorageService.get('secret')
+    console.log (data)
+
+    if userEmail? and userSecret?
+      $rootScope.updateStatus = "start"
+      data = 
+        email: userEmail
+        secret: userSecret
+    console.log (data)
+
+    email = data['email']
+    secret = data['secret']
     success = (data, status, headers, config) ->
       $rootScope.updateStatus = "Users"
       if data.result?
@@ -63,6 +82,8 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         User.data = data.result
         User.data['secret'] = secret
         User.authenticated = true
+        console.log ("user")
+        console.log(User)
         successForms = (data, status, headers, config) ->
           $rootScope.updateStatus = "Forms"
           if data.result?
@@ -70,10 +91,6 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
             console.log(data.result)
             formsService.orderedData = data.result
             formData = {}
-            # $rootScope.appReady()
-            # $location.path("/all_forms")
-            # $rootScope.stopLoad()
-            # raise_error_message("Login Successful")
             for form in data.result
               formData[form._id] = form
             formsService.data = formData
@@ -85,6 +102,8 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
                 for field in data.result
                   fieldData[field._id] = field
                 fieldsService.data = fieldData
+                localStorageService.add('email', User.data.profile.email)
+                localStorageService.add('secret', User.data.secret)
                 successUpdate()
             make_request("/fields", "GET", null, successFields)
         make_request("/forms", "GET", null, successForms)
@@ -93,7 +112,9 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         raise_error_message("Incorrect email & password combination")
         localStorageService.clearAll()
         User.authenticated = false
-        $$rootScope.updateStatus = "error"
+        console.log("sending to sign in")
+        $location.path("/sign_in")
+        $rootScope.updateStatus = "error"
         $rootScope.stopLoad()
     make_request("/auth/users", "POST", data, success)
   
@@ -101,8 +122,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
     => $location.path(),
     (next, prev) ->
       if not User.authenticated and $location.path().search("sign") == -1
+        $rootScope.updateUser()
         console.log $location.path()
-        console.log("sending to sign in")
-        $location.path("/sign_in")
   )
 ]

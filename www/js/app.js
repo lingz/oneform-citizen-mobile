@@ -59,15 +59,35 @@
   ]);
 
   app.run([
-    "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", function($rootScope, $location, User, fieldsService, formsService, localStorageService) {
+    "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", "$route", function($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) {
       var _this = this;
-      $rootScope.updateUser = function(email, secret, successUpdate) {
-        var data, success;
-        $rootScope.updateStatus = "start";
-        data = {
-          email: email,
-          secret: secret
+      $rootScope.updateUser = function(userEmail, userSecret, userSuccessUpdate) {
+        var data, email, secret, success, successUpdate;
+        successUpdate = function() {
+          if (userSuccessUpdate != null) {
+            userSuccessUpdate();
+          }
+          $rootScope.stopLoad();
+          $rootScope.$apply();
+          $route.reload();
+          return console.log("Done update");
         };
+        console.log("LOCAL");
+        data = {
+          email: localStorageService.get('email'),
+          secret: localStorageService.get('secret')
+        };
+        console.log(data);
+        if ((userEmail != null) && (userSecret != null)) {
+          $rootScope.updateStatus = "start";
+          data = {
+            email: userEmail,
+            secret: userSecret
+          };
+        }
+        console.log(data);
+        email = data['email'];
+        secret = data['secret'];
         success = function(data, status, headers, config) {
           var successForms;
           $rootScope.updateStatus = "Users";
@@ -79,6 +99,8 @@
             User.data = data.result;
             User.data['secret'] = secret;
             User.authenticated = true;
+            console.log("user");
+            console.log(User);
             successForms = function(data, status, headers, config) {
               var form, formData, successFields, _i, _len, _ref;
               $rootScope.updateStatus = "Forms";
@@ -105,6 +127,8 @@
                       fieldData[field._id] = field;
                     }
                     fieldsService.data = fieldData;
+                    localStorageService.add('email', User.data.profile.email);
+                    localStorageService.add('secret', User.data.secret);
                     return successUpdate();
                   }
                 };
@@ -116,7 +140,9 @@
             raise_error_message("Incorrect email & password combination");
             localStorageService.clearAll();
             User.authenticated = false;
-            $$rootScope.updateStatus = "error";
+            console.log("sending to sign in");
+            $location.path("/sign_in");
+            $rootScope.updateStatus = "error";
             return $rootScope.stopLoad();
           }
         };
@@ -126,9 +152,8 @@
         return $location.path();
       }, function(next, prev) {
         if (!User.authenticated && $location.path().search("sign") === -1) {
-          console.log($location.path());
-          console.log("sending to sign in");
-          return $location.path("/sign_in");
+          $rootScope.updateUser();
+          return console.log($location.path());
         }
       });
     }
