@@ -39,7 +39,9 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
     $scope.appLoaded = false
 
   $scope.onRefresh = () ->
-    $rootScope.updateUser()
+    $rootScope.updateUser(null,null,()->
+        raise_error_message("Successful Update")
+    )
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
@@ -194,7 +196,6 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
     else
       raise_error_message("Required fields missing")
       $rootScope.stopLoad()
-
 ]
 
 

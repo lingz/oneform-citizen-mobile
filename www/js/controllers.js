@@ -47,7 +47,9 @@
         return $scope.appLoaded = false;
       };
       return $scope.onRefresh = function() {
-        return $rootScope.updateUser();
+        return $rootScope.updateUser(null, null, function() {
+          return raise_error_message("Successful Update");
+        });
       };
     }
   ]);

@@ -57,7 +57,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
       $route.reload()
       console.log ("Done update")
 
-    successCount = 0
+    $rootScope.successCount = 0
     
     console.log ("LOCAL")
     data = 
@@ -86,7 +86,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         User.authenticated = true
         console.log ("user")
         console.log(User)
-        successCount += 1
+        $rootScope.successCount += 1
         $rootScope.doneDownloading()
       else
         raise_error_message("Incorrect email & password combination")
@@ -106,7 +106,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         for form in data.result
           formData[form._id] = form
         formsService.data = formData
-        successCount += 1
+        $rootScope.successCount += 1
         $rootScope.doneDownloading()
     successFields = (data, status, headers, config) ->
       $rootScope.updateStatus = "Fields"
@@ -116,14 +116,15 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         for field in data.result
           fieldData[field._id] = field
         fieldsService.data = fieldData
-        successCount += 1
+        $rootScope.successCount += 1
         $rootScope.doneDownloading()
 
     $rootScope.doneDownloading = () ->
-      if successCount == 3
+      if $rootScope.successCount == 3
         localStorageService.add('email', User.data.profile.email)
         localStorageService.add('secret', User.data.secret)
         successUpdate()
+        $rootScope.successCount = 0
 
     make_request("/fields", "GET", null, successFields)
     make_request("/forms", "GET", null, successForms)

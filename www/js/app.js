@@ -62,7 +62,7 @@
     "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", "$route", function($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) {
       var _this = this;
       $rootScope.updateUser = function(userEmail, userSecret, userSuccessUpdate) {
-        var data, email, secret, success, successCount, successFields, successForms, successUpdate;
+        var data, email, secret, success, successFields, successForms, successUpdate;
         successUpdate = function() {
           if (userSuccessUpdate != null) {
             userSuccessUpdate();
@@ -72,7 +72,7 @@
           $route.reload();
           return console.log("Done update");
         };
-        successCount = 0;
+        $rootScope.successCount = 0;
         console.log("LOCAL");
         data = {
           email: localStorageService.get('email'),
@@ -101,7 +101,7 @@
             User.authenticated = true;
             console.log("user");
             console.log(User);
-            successCount += 1;
+            $rootScope.successCount += 1;
             return $rootScope.doneDownloading();
           } else {
             raise_error_message("Incorrect email & password combination");
@@ -127,7 +127,7 @@
               formData[form._id] = form;
             }
             formsService.data = formData;
-            successCount += 1;
+            $rootScope.successCount += 1;
             return $rootScope.doneDownloading();
           }
         };
@@ -143,15 +143,16 @@
               fieldData[field._id] = field;
             }
             fieldsService.data = fieldData;
-            successCount += 1;
+            $rootScope.successCount += 1;
             return $rootScope.doneDownloading();
           }
         };
         $rootScope.doneDownloading = function() {
-          if (successCount === 3) {
+          if ($rootScope.successCount === 3) {
             localStorageService.add('email', User.data.profile.email);
             localStorageService.add('secret', User.data.secret);
-            return successUpdate();
+            successUpdate();
+            return $rootScope.successCount = 0;
           }
         };
         make_request("/fields", "GET", null, successFields);
