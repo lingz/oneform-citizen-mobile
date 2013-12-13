@@ -8,12 +8,6 @@ app = angular.module("myApp", ["ionic", "myApp.filters", "myApp.services",
   "myApp.controllers", "myApp.directives", "ngRoute", "LocalStorageModule"])
 
 app.config ["$routeProvider", ($routeProvider) ->
-  $routeProvider.when "/",
-    templateUrl: "index.html"
-    controller: "IndexController",
-    access:
-      isFree: true
-
   $routeProvider.when "/sign_in",
     templateUrl: "partials/sign_in.html"
     controller: "SignInController",
@@ -79,8 +73,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
       if data.result?
         console.log ("user")
         console.log(User)
-        console.log("data")
-        console.log (data.result)
+        console.log("data") console.log (data.result)
         User.data = data.result
         User.data['secret'] = secret
         User.authenticated = true

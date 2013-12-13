@@ -9,13 +9,6 @@
 
   app.config([
     "$routeProvider", function($routeProvider) {
-      $routeProvider.when("/", {
-        templateUrl: "index.html",
-        controller: "IndexController",
-        access: {
-          isFree: true
-        }
-      });
       $routeProvider.when("/sign_in", {
         templateUrl: "partials/sign_in.html",
         controller: "SignInController"
@@ -94,8 +87,7 @@
           if (data.result != null) {
             console.log("user");
             console.log(User);
-            console.log("data");
-            console.log(data.result);
+            console.log("data")(console.log(data.result));
             User.data = data.result;
             User.data['secret'] = secret;
             User.authenticated = true;
