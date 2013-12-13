@@ -1,5 +1,5 @@
 <li>
-<input id="{{fieldInfo._id}}" ng-model="fieldInfo.value" ng-class="{'empty': fieldInfo.value == '' || !fieldInfo.value}" value='' ng-keyup="keyup($event)" type="{{htmltype ? htmltype : 'text'}}" ng-disabled="disabledstate">
-  <label for="{{fieldInfo._id}}">{{fieldInfo.name}}</label>
-  <div class="description">{{fieldInfo.description}}</div>
+  <input id="{{_id}}" ng-model="field" ng-class="{'empty': field == '' || !field}" value='' ng-keyup="keyup($event)" type="{{htmltype ? htmltype : 'text'}}" ng-disabled="disabledstate">
+  <label for="{{_id}}">{{label}}</label>
+  <div class="description">{{description}}</div>
 </li>

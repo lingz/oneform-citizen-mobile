@@ -30,23 +30,22 @@ app1.directive "inputForm", ->
     templateUrl: "partials/input-form.html"
   }
 
-app1.directive "inputField", ->
+dir.directive "inputField", ->
   return {
     restrict: "E",
     templateUrl: "partials/input-field.html",
     scope: {
-      fieldInfo: "=field",
+      field: "=field",
       keyup: "&"
     }
     link: (scope, element, attrs) ->
       scope.keyup = ($event) ->
-        scope.fieldInfo.value = element.find("input").val()
-      console.log("attrs")
-      console.log(attrs)
-      scope.htmltype = attrs.htmltype
+        scope.field = element.find("input").val()
+      scope.htmltype = if attrs.htmltype? then attrs.htmltype else "text"
       scope.disabledstate = attrs.disabledstate
-      console.log(scope.disabledstate)
-      console.log(scope.htmltype)
+      scope.description = attrs.description
+      scope.label = attrs.label
+      scope._id = if attrs._id? then attrs._id else attrs.label + "id"
   }
 
 app1.directive "bigQuery", ->
