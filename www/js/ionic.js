@@ -2370,6 +2370,12 @@ ionic.views.Scroll = ionic.views.View.inherit({
       minScrollbarSizeX: 5,
       minScrollbarSizeY: 5,
 
+      /** Scrollbar fading after scrolling */
+      scrollbarsFade: true,
+      scrollbarFadeDelay: 300,
+      /** The initial fade delay when the pane is resized or initialized */
+      scrollbarResizeFadeDelay: 1000,
+
 			/** Enable animations for deceleration, snap back, zooming and scrolling */
 			animating: true,
 
@@ -2445,6 +2451,9 @@ ionic.views.Scroll = ionic.views.View.inherit({
     this.__initEventHandlers();
     this.__createScrollbars();
     this.resize();
+
+    // Fade them out
+    this.__fadeScrollbars('out', this.options.scrollbarResizeFadeDelay);
 	},
 
 
@@ -2614,6 +2623,9 @@ ionic.views.Scroll = ionic.views.View.inherit({
   __indicatorX: null,
   __indicatorY: null,
 
+  /** Timeout for scrollbar fading */
+  __scrollbarFadeTimeout: null,
+
   /** {Boolean} whether we've tried to wait for size already */
   __didWaitForSize: null,
   __sizerTimeout: null,
@@ -2741,9 +2753,15 @@ ionic.views.Scroll = ionic.views.View.inherit({
   __resizeScrollbars: function() {
     var self = this;
 
+    // Bring the scrollbars in to show the content change
+    self.__fadeScrollbars('in');
+
     // Update horiz bar
     if(self.__indicatorX) {
       var width = Math.max(Math.round(self.__clientWidth * self.__clientWidth / (self.__contentWidth)), 20);
+      if(width > self.__contentWidth) {
+        width = 0;
+      }
       self.__indicatorX.size = width;
       self.__indicatorX.minScale = this.options.minScrollbarSizeX / width;
       self.__indicatorX.indicator.style.width = width + 'px';
@@ -2754,6 +2772,9 @@ ionic.views.Scroll = ionic.views.View.inherit({
     // Update vert bar
     if(self.__indicatorY) {
       var height = Math.max(Math.round(self.__clientHeight * self.__clientHeight / (self.__contentHeight)), 20);
+      if(height > self.__contentHeight) {
+        height = 0;
+      }
       self.__indicatorY.size = height;
       self.__indicatorY.minScale = this.options.minScrollbarSizeY / height;
       self.__indicatorY.maxPos = self.__clientHeight - height;
@@ -2766,15 +2787,21 @@ ionic.views.Scroll = ionic.views.View.inherit({
    * Move and scale the scrollbars as the page scrolls.
    */
   __repositionScrollbars: function() {
-    var self = this, width, heightScale, widthDiff, heightDiff, x, y;
+    var self = this, width, heightScale,
+        widthDiff, heightDiff,
+        x, y,
+        xstop = 0, ystop = 0;
 
     if(self.__indicatorX) {
       // Handle the X scrollbar
 
+      // Don't go all the way to the right if we have a vertical scrollbar as well
+      if(self.__indicatorY) xstop = 10;
+
       x = Math.round(self.__indicatorX.sizeRatio * self.__scrollLeft) || 0,
 
       // The the difference between the last content X position, and our overscrolled one
-      widthDiff = self.__scrollLeft - self.__maxScrollLeft;
+      widthDiff = self.__scrollLeft - (self.__maxScrollLeft - xstop);
 
       if(self.__scrollLeft < 0) {
 
@@ -2792,7 +2819,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
             (self.__indicatorX.size - widthDiff) / self.__indicatorX.size);
 
         // Stay at the furthest x for the scrollable viewport
-        x = self.__indicatorX.maxPos;
+        x = self.__indicatorX.maxPos - xstop;
 
         // Make sure scale is transformed from the right/center origin point
         self.__indicatorX.indicator.style[self.__transformOriginProperty] = 'right center';
@@ -2812,7 +2839,10 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
       y = Math.round(self.__indicatorY.sizeRatio * self.__scrollTop) || 0;
 
-      heightDiff = self.__scrollTop - self.__maxScrollTop;
+      // Don't go all the way to the right if we have a vertical scrollbar as well
+      if(self.__indicatorX) ystop = 10;
+
+      heightDiff = self.__scrollTop - (self.__maxScrollTop - ystop);
 
       if(self.__scrollTop < 0) {
 
@@ -2829,7 +2859,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
         heightScale = Math.max(self.__indicatorY.minScale, (self.__indicatorY.size - heightDiff) / self.__indicatorY.size);
 
         // Stay at bottom of scrollable viewport
-        y = self.__indicatorY.maxPos;
+        y = self.__indicatorY.maxPos - ystop;
 
         // Make sure scale is transformed from the center/bottom origin point
         self.__indicatorY.indicator.style[self.__transformOriginProperty] = 'center bottom';
@@ -2844,6 +2874,37 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
       self.__indicatorY.indicator.style[self.__transformProperty] = 'translate3d(0,' + y + 'px, 0) scaleY(' + heightScale + ')';
     }
+  },
+
+  __fadeScrollbars: function(direction, delay) {
+    var self = this;
+
+    if(!this.options.scrollbarsFade) {
+      return;
+    }
+
+    var className = 'scroll-bar-fade-out';
+
+    if(self.options.scrollbarsFade === true) {
+      clearTimeout(self.__scrollbarFadeTimeout);
+
+      if(direction == 'in') {
+        if(self.__indicatorX) { self.__indicatorX.indicator.classList.remove(className); }
+        if(self.__indicatorY) { self.__indicatorY.indicator.classList.remove(className); }
+      } else {
+        self.__scrollbarFadeTimeout = setTimeout(function() {
+          if(self.__indicatorX) { self.__indicatorX.indicator.classList.add(className); }
+          if(self.__indicatorY) { self.__indicatorY.indicator.classList.add(className); }
+        }, delay || self.options.scrollbarFadeDelay);
+      }
+    }
+  },
+
+  __scrollingComplete: function() {
+    var self = this;
+    self.options.scrollingComplete();
+
+    self.__fadeScrollbars('out');
   },
 
   resize: function() {
@@ -3308,6 +3369,8 @@ ionic.views.Scroll = ionic.views.View.inherit({
 
     var self = this;
 
+    self.__fadeScrollbars('in');
+
     // Reset interruptedAnimation flag
     self.__interruptedAnimation = true;
 
@@ -3632,10 +3695,10 @@ ionic.views.Scroll = ionic.views.View.inherit({
             }
           }
         } else {
-          self.options.scrollingComplete();
+          self.__scrollingComplete();
         }
       } else if ((timeStamp - self.__lastTouchMove) > 100) {
-        self.options.scrollingComplete();
+        self.__scrollingComplete();
       }
     }
 
@@ -3659,7 +3722,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
       } else {
 
         if (self.__interruptedAnimation || self.__isDragging) {
-          self.options.scrollingComplete();
+          self.__scrollingComplete();
         }
         self.scrollTo(self.__scrollLeft, self.__scrollTop, true, self.__zoomLevel);
 
@@ -3746,7 +3809,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
           self.__isAnimating = false;
         }
         if (self.__didDecelerationComplete || wasFinished) {
-          self.options.scrollingComplete();
+          self.__scrollingComplete();
         }
 
         if (self.options.zooming) {
@@ -3805,13 +3868,17 @@ ionic.views.Scroll = ionic.views.View.inherit({
     var self = this;
 
     clearTimeout(self.__sizerTimeout);
-    self.__sizerTimeout = setTimeout(function sizer() {
-      self.resize();
-      if(self.__maxScrollLeft == 0 && self.__maxScrollTop == 0) {
-        self.__sizerTimeout = setTimeout(sizer, 1000);
-      }
-    }, 1000);
 
+    var sizer = function() {
+      self.resize();
+        
+      if((self.options.scrollingX && self.__maxScrollLeft == 0) || (self.options.scrollingY && self.__maxScrollTop == 0)) {
+        //self.__sizerTimeout = setTimeout(sizer, 1000);
+      }
+    };
+
+    sizer();
+    self.__sizerTimeout = setTimeout(sizer, 1000);
   },
 
   /*
@@ -3872,11 +3939,11 @@ ionic.views.Scroll = ionic.views.View.inherit({
     var completed = function(renderedFramesPerSecond, animationId, wasFinished) {
       self.__isDecelerating = false;
       if (self.__didDecelerationComplete) {
-        self.options.scrollingComplete();
+        self.__scrollingComplete();
       }
 
       // Animate to grid when snapping is active, otherwise just fix out-of-boundary positions
-      self.scrollTo(self.__scrollLeft, self.__scrollTop, self.options.snapping);
+      //self.scrollTo(self.__scrollLeft, self.__scrollTop, self.options.snapping);
     };
 
     // Start animation and switch on flag
@@ -4416,9 +4483,12 @@ ionic.views.Scroll = ionic.views.View.inherit({
       }, this.el);
 
       window.ionic.onGesture('release', function(e) {
-        _this._handleTouchRelease(e);
+        _this._handleEndDrag(e);
       }, this.el);
         
+      window.ionic.onGesture('drag', function(e) {
+        _this._handleDrag(e);
+      }, this.el);
       // Start the drag states
       this._initDrag();
     },
@@ -4551,6 +4621,13 @@ ionic.views.Scroll = ionic.views.View.inherit({
         return;
       }
 
+      // Cancel touch timeout
+      clearTimeout(this._touchTimeout);
+      var items = _this.el.querySelectorAll('.item');
+      for(var i = 0, l = items.length; i < l; i++) {
+        items[i].classList.remove('active');
+      }
+
       this._dragOp.end(e, function() {
         _this._initDrag();
       });
@@ -4581,7 +4658,7 @@ ionic.views.Scroll = ionic.views.View.inherit({
         return;
       }
 
-      e.preventDefault();
+      e.gesture.srcEvent.preventDefault();
       this._dragOp.drag(e);
     },
 
@@ -4603,19 +4680,6 @@ ionic.views.Scroll = ionic.views.View.inherit({
       }, 250);
     },
 
-    /**
-     * Handle the release event to remove the active state on an item if necessary.
-     */
-    _handleTouchRelease: function(e) {
-      var _this = this;
-
-      // Cancel touch timeout
-      clearTimeout(this._touchTimeout);
-      var items = _this.el.querySelectorAll('.item');
-      for(var i = 0, l = items.length; i < l; i++) {
-        items[i].classList.remove('active');
-      }
-    }
   });
 
 })(ionic);
