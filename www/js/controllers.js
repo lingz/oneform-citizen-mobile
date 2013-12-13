@@ -52,27 +52,21 @@
   app1.controller("SignInController", [
     '$scope', '$http', 'User', '$location', '$rootScope', 'formsService', 'fieldsService', 'localStorageService', function($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) {
       var local;
-      $scope.user = {
-        email: {
-          name: "Email",
-          _id: "userEmail",
-          value: ""
-        },
-        secret: {
-          name: "Password",
-          _id: "userPassword",
-          value: ""
-        }
-      };
       $scope.signIn = function(user, email, secret) {
-        var loadMessage;
+        var loadMessage, successUpdate;
         if (!((email != null) && (secret != null))) {
-          email = user.email.value;
-          secret = CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString();
+          email = user.email;
+          secret = CryptoJS.SHA512(user.email + 'oneform.in' + user.secret).toString();
         }
         loadMessage = $scope.loadingMessage ? $scope.loadingMessage : "Loading...";
         $rootScope.startLoad(loadMessage);
-        return $rootScope.updateUser(email, secret);
+        successUpdate = function() {
+          $rootScope.appReady();
+          $location.path("/all_forms");
+          $rootScope.stopLoad();
+          return raise_error_message("Login Successful");
+        };
+        return $rootScope.updateUser(email, secret, successUpdate);
       };
       local = {};
       local['email'] = localStorageService.get('email');
@@ -119,11 +113,7 @@
         }
       };
       return $scope.signUp = function(user) {
-        var k, originalData, success, v;
-        for (k in user) {
-          v = user[k];
-          user[k] = v.value;
-        }
+        var originalData, success;
         console.log("creating user");
         console.log(user);
         console.log($scope.signUpForm.$valid);
@@ -178,7 +168,7 @@
         }
       };
       return $scope.post_form = function() {
-        var data, dataForm, field, fieldData, route, routeForm, succesfullUpload, success, _j, _len1;
+        var data, dataForm, field, fieldData, route, routeForm, succesfullUpload, successData, _j, _len1;
         console.log(User);
         fieldData = $scope.fields;
         if (fieldData != null) {
@@ -186,6 +176,24 @@
           succesfullUpload = true;
           for (_j = 0, _len1 = fieldData.length; _j < _len1; _j++) {
             field = fieldData[_j];
+            successData = function(data, textStatus, jqXHR) {
+              var dataOrgs, orgsRoute;
+              console.log("data result");
+              console.log(data);
+              if (data.status !== 200) {
+                succesfullUpload = false;
+              }
+              $scope.status = "confirmed";
+              console.log("ORGSS");
+              orgsRoute = "/users/" + User['data']['_id'] + "/data/" + field._id + "/orgs";
+              dataOrgs = {
+                _id: User['data']['_id'],
+                secret: User['data']['secret'],
+                orgs: $scope.current_form['orgs']
+              };
+              make_request(orgsRoute, "POST", dataOrgs, null, null, "OrgsResponse");
+              return console.log("ORGSS DONE");
+            };
             data = {
               _id: User['data']['_id'],
               secret: User['data']['secret'],
@@ -194,27 +202,7 @@
             };
             console.log(data);
             route = "/users/" + User['data']['_id'] + "/data";
-            success = function(data, textStatus, jqXHR) {
-              var dataOrgs, orgsRoute;
-              console.log("data result");
-              $scope.lastData = data;
-              if (data.status !== 200) {
-                succesfullUpload = false;
-              }
-              $scope.status = "confirmed";
-              console.log("ORGSS");
-              console.log($scope.lastData);
-              console.log($scope.lastData['result']);
-              orgsRoute = "/users/" + User['data']['_id'] + "/data/" + $scope.lastData['result']['_id'] + "/orgs";
-              dataOrgs = {
-                _id: User['data']['_id'],
-                secret: User['data']['secret'],
-                orgs: $scope.current_form['orgs']
-              };
-              make_request(orgsRoute, "POST", dataOrgs, success);
-              return console.log("ORGSS DONE");
-            };
-            make_request(route, "POST", data, success);
+            make_request(route, "POST", data, successData);
           }
           if (succesfullUpload === true) {
             console.log("form:!@");
@@ -225,7 +213,7 @@
               secret: User['data']['secret'],
               formId: $scope.current_form_id
             };
-            return make_request(routeForm, "POST", dataForm, success);
+            return make_request(routeForm, "POST", dataForm);
           } else {
             raise_error_message("Error uploading form");
             return $rootScope.stopLoad();

@@ -48,11 +48,13 @@ app.config ["$routeProvider", ($routeProvider) ->
 
 app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService",\
  ($rootScope, $location, User, fieldsService, formsService, localStorageService) ->
-  $rootScope.updateUser = (email, secret) ->
-    data =
+  $rootScope.updateUser = (email, secret, successUpdate) ->
+    $rootScope.updateStatus = "start"
+    data = 
       email: email
       secret: secret
     success = (data, status, headers, config) ->
+      $rootScope.updateStatus = "Users"
       if data.result?
         console.log ("user")
         console.log(User)
@@ -62,32 +64,36 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         User.data['secret'] = secret
         User.authenticated = true
         successForms = (data, status, headers, config) ->
+          $rootScope.updateStatus = "Forms"
           if data.result?
             console.log("success here!kjhx;")
             console.log(data.result)
             formsService.orderedData = data.result
             formData = {}
-            $rootScope.appReady()
-            $location.path("/all_forms")
-            $rootScope.stopLoad()
-            raise_error_message("Login Successful")
+            # $rootScope.appReady()
+            # $location.path("/all_forms")
+            # $rootScope.stopLoad()
+            # raise_error_message("Login Successful")
             for form in data.result
               formData[form._id] = form
             formsService.data = formData
+            successFields = (data, status, headers, config) ->
+              $rootScope.updateStatus = "Fields"
+              if data.result?
+                console.log(data.result)
+                fieldData = {}
+                for field in data.result
+                  fieldData[field._id] = field
+                fieldsService.data = fieldData
+                successUpdate()
+            make_request("/fields", "GET", null, successFields)
         make_request("/forms", "GET", null, successForms)
-        successFields = (data, status, headers, config) ->
-          if data.result?
-            console.log(data.result)
-            fieldData = {}
-            for field in data.result
-              fieldData[field._id] = field
-            fieldsService.data = fieldData
-            $rootScope.$apply()
-        make_request("/fields", "GET", null, successFields)
+          
       else
         raise_error_message("Incorrect email & password combination")
         localStorageService.clearAll()
         User.authenticated = false
+        $$rootScope.updateStatus = "error"
         $rootScope.stopLoad()
     make_request("/auth/users", "POST", data, success)
   

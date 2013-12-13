@@ -30,7 +30,7 @@ app1.directive "inputForm", ->
     templateUrl: "partials/input-form.html"
   }
 
-dir.directive "inputField", ->
+app1.directive "inputField", ->
   return {
     restrict: "E",
     templateUrl: "partials/input-field.html",

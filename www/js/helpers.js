@@ -2,12 +2,15 @@
 (function() {
   window.serverAddress = "http://ec2-54-218-85-114.us-west-2.compute.amazonaws.com";
 
-  window.make_request = function(route, type, data, success, error) {
-    if (type === "POST" || type === "PUT") {
+  window.make_request = function(route, type, data, success, error, name) {
+    if (type === "POST") {
       data = JSON.stringify(data);
     }
     if (success === null) {
       success = function() {
+        if (name != null) {
+          console.log(name);
+        }
         return console.log(data);
       };
     }

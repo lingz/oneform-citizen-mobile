@@ -42,24 +42,21 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
  'formsService', 'fieldsService','localStorageService',\
  ($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) ->
-  
-  $scope.user =
-    email:
-      name: "Email"
-      _id: "userEmail"
-      value: ""
-    secret:
-      name: "Password"
-      _id: "userPassword"
-      value: ""
 
   $scope.signIn = (user, email, secret) ->
     if not (email? and secret?)
-      email = user.email.value
-      secret = CryptoJS.SHA512(user.email.value + 'oneform.in' + user.secret.value).toString()
+      email = user.email
+      secret = CryptoJS.SHA512(user.email + 'oneform.in' + user.secret).toString()
     loadMessage = if $scope.loadingMessage then $scope.loadingMessage else "Loading..."
     $rootScope.startLoad(loadMessage)
-    $rootScope.updateUser(email, secret)
+    successUpdate = () ->
+      $rootScope.appReady()
+      $location.path("/all_forms")
+      $rootScope.stopLoad()
+      raise_error_message("Login Successful")
+
+    $rootScope.updateUser(email, secret, successUpdate)
+
 
   local = {}
   local['email'] = localStorageService.get('email')
@@ -99,8 +96,6 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
       id: "password"
 
   $scope.signUp = (user) ->
-    for k, v of user
-      user[k] = v.value
     console.log("creating user")
     console.log(user)
     console.log($scope.signUpForm.$valid)
@@ -152,32 +147,35 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
       $scope.status = "sending"
       succesfullUpload = true
       for field in fieldData
+
+        successData = (data,textStatus,jqXHR) ->
+          console.log ("data result")
+          console.log (data)
+          if data.status != 200
+            succesfullUpload = false
+          $scope.status = "confirmed"
+          console.log ("ORGSS")
+          orgsRoute = "/users/"+User['data']['_id']+"/data/"+field._id+"/orgs"
+          dataOrgs = 
+            _id:User['data']['_id']
+            secret: User['data']['secret']
+            orgs:$scope.current_form['orgs']
+
+          #add orgs to data
+          make_request(orgsRoute,"POST",dataOrgs, null, null,"OrgsResponse")
+          console.log ("ORGSS DONE")
+
         data =
           _id: User['data']['_id']
           secret: User['data']['secret']
           fieldId: field._id
           value: field.value
+
         console.log (data)
         route = "/users/"+User['data']['_id']+"/data"
-        success = (data,textStatus,jqXHR) ->
-          console.log ("data result")
-          $scope.lastData = data
-          if data.status != 200
-            succesfullUpload = false
-          $scope.status = "confirmed"
-          console.log ("ORGSS")
-          console.log ($scope.lastData)
-          console.log ($scope.lastData['result'])
-          orgsRoute = "/users/"+User['data']['_id']+"/data/"+$scope.lastData['result']['_id']+"/orgs"
-          dataOrgs = 
-            _id:User['data']['_id']
-            secret: User['data']['secret']
-            orgs:$scope.current_form['orgs']
-          make_request(orgsRoute,"POST",dataOrgs, success)
-          console.log ("ORGSS DONE")
+        #change data
+        make_request(route,"POST", data ,successData)
 
-
-        make_request(route,"POST", data ,success)
       if succesfullUpload == true
         console.log ("form:!@")
         console.log ($scope.current_form)
@@ -186,7 +184,8 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
           _id: User['data']['_id']
           secret: User['data']['secret']
           formId: $scope.current_form_id
-        make_request(routeForm,"POST", dataForm, success)
+        #add for to user
+        make_request(routeForm,"POST", dataForm)
       else
         raise_error_message("Error uploading form")
         $rootScope.stopLoad()

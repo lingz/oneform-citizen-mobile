@@ -1,11 +1,11 @@
 <div id="sign-up">
 	<form name="signUpForm" ng-controller="SignUpController" method="POST" novalidate ng-submit="signUp(user)">
     <ol>
-      <input-field field="user.firstName"></input-field>
-      <input-field field="user.lastName"></input-field>
-      <input-field field="user.email"></input-field>
-      <input-field field="user.uniqueId"></input-field>
-      <input-field field="user.password"></input-field>
+      <input-field label="First Name" field="user.firstName.value"></input-field>
+      <input-field label="Last Name" field="user.lastName.value"></input-field>
+      <input-field label="Email" field="user.email.value"></input-field>
+      <input-field label="Emirates ID" field="user.uniqueId.value"></input-field>
+      <input-field label="Password" field="user.password.value"></input-field>
     </ol>
 		<button class="button button-clear submit medium-text submit" value="Sign Up">Sign Up</button>
 	</form>
