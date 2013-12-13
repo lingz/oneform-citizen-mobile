@@ -87,7 +87,8 @@
           if (data.result != null) {
             console.log("user");
             console.log(User);
-            console.log("data")(console.log(data.result));
+            console.log("data");
+            console.log(data.result);
             User.data = data.result;
             User.data['secret'] = secret;
             User.authenticated = true;
