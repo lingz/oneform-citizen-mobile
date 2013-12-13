@@ -37,6 +37,9 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
 
   $rootScope.appUnready = () ->
     $scope.appLoaded = false
+
+  $scope.onRefresh = () ->
+    $rootScope.updateUser()
 ]
 
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\

@@ -43,8 +43,11 @@
       $rootScope.appReady = function() {
         return $scope.appLoaded = true;
       };
-      return $rootScope.appUnready = function() {
+      $rootScope.appUnready = function() {
         return $scope.appLoaded = false;
+      };
+      return $scope.onRefresh = function() {
+        return $rootScope.updateUser();
       };
     }
   ]);
