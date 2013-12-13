@@ -15,7 +15,7 @@
   ]);
 
   app1.controller("menuController", [
-    '$scope', '$location', '$rootScope', function($scope, $location, $rootScope) {
+    '$scope', '$location', '$rootScope', 'User', function($scope, $location, $rootScope, User) {
       $scope.appLoaded = false;
       $scope.closeLeft = function() {
         return $scope.sideMenuController.close();
@@ -45,12 +45,16 @@
         }
       };
       $rootScope.appReady = function() {
-        return $scope.appLoaded = true;
+        return $rootScope.appLoaded = true;
       };
       $rootScope.appUnready = function() {
         return $scope.appLoaded = false;
       };
       return $scope.onRefresh = function() {
+        if (!User.authenticated) {
+          $scope.$broadcast('scroll.refreshComplete');
+          return;
+        }
         return $rootScope.updateUser(null, null, function() {
           return raise_error_message("Successful Update");
         });
@@ -82,8 +86,7 @@
       local['secret'] = localStorageService.get('secret');
       console.log(local);
       if (User.authenticated) {
-        $location.path("/all_forms");
-        return $rootScope.$apply();
+        return $location.path("/all_forms");
       } else if ((local.email != null) && (local.secret != null)) {
         console.log("authenticating1");
         return $scope.signIn("", local['email'], local['secret']);
@@ -152,8 +155,11 @@
   ]);
 
   app1.controller("FormController", [
-    '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope', function($scope, $routeParams, User, formsService, fieldsService, $rootScope) {
+    '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope', '$location', function($scope, $routeParams, User, formsService, fieldsService, $rootScope, $location) {
       var field_id, _i, _len, _ref;
+      if (!$rootScope.userIsAuthenticated()) {
+        return;
+      }
       $scope.current_form_id = $routeParams._id;
       $scope.current_form = formsService['data'][$scope.current_form_id];
       console.log("scope._id, formsService, fieldsService");
@@ -201,7 +207,10 @@
                 orgs: $scope.current_form['orgs']
               };
               make_request(orgsRoute, "POST", dataOrgs, null, null, "OrgsResponse");
-              return console.log("ORGSS DONE");
+              console.log("ORGSS DONE");
+              raise_error_message("Form Submitted");
+              $location.path("/mydata");
+              return $rootScope.$apply();
             };
             data = {
               _id: User['data']['_id'],
@@ -236,7 +245,10 @@
   ]);
 
   app1.controller("FormDisplayController", [
-    '$scope', 'formsService', function($scope, formsService) {
+    '$scope', 'formsService', '$rootScope', function($scope, formsService, $rootScope) {
+      if (!$rootScope.userIsAuthenticated()) {
+        return;
+      }
       $scope.query = {
         name: "Search",
         _id: "formSearch"
@@ -247,33 +259,33 @@
   ]);
 
   app1.controller("MyDataController", [
-    '$scope', 'User', 'fieldsService', function($scope, User, fieldsService) {
-      var key, mydata, value, _ref, _ref1;
+    '$scope', 'User', 'fieldsService', '$rootScope', function($scope, User, fieldsService, $rootScope) {
+      var key, value, _ref, _ref1;
+      if (!$rootScope.userIsAuthenticated()) {
+        return;
+      }
       console.log(User);
-      mydata = {
-        'profile': [],
-        'data': []
-      };
+      $scope.mydata = [];
       console.log("MYUSER");
       console.log(User);
       _ref = User['data']['profile'];
       for (key in _ref) {
         value = _ref[key];
-        mydata['profile'].push({
+        $scope.mydata.push({
           name: key,
-          value: value
+          value: value,
+          access: "Public"
         });
       }
       _ref1 = User['data']['data'];
       for (key in _ref1) {
         value = _ref1[key];
-        mydata['data'].push({
+        $scope.mydata.push({
           name: fieldsService['data'][key]['name'],
           value: value['value'],
           access: value['access']
         });
       }
-      $scope.mydata = mydata;
       console.log("MYDATA");
       console.log($scope.mydata);
       return console.log(fieldsService);
@@ -281,8 +293,11 @@
   ]);
 
   app1.controller("MyFormsController", [
-    '$scope', 'User', 'fieldsService', 'fieldsService', function($scope, User, fieldsService, formsService) {
+    '$scope', 'User', 'fieldsService', 'formsService', '$rootScope', function($scope, User, fieldsService, formsService, $rootScope) {
       var key, mydata, value, _ref, _ref1;
+      if (!$rootScope.userIsAuthenticated()) {
+        return;
+      }
       console.log(User);
       mydata = {
         'profile': [],

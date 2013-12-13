@@ -9,7 +9,7 @@ app1.controller "LogoutController", ['$scope', '$location', 'localStorageService
   $location.path("/sign_in")
 ]
 
-app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope, $location, $rootScope) ->
+app1.controller "menuController", ['$scope', '$location', '$rootScope', 'User', ($scope, $location, $rootScope, User) ->
   $scope.appLoaded = false
   $scope.closeLeft = () ->
     $scope.sideMenuController.close()
@@ -35,12 +35,15 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
       $rootScope.$apply()
 
   $rootScope.appReady = () ->
-    $scope.appLoaded = true
+    $rootScope.appLoaded = true
 
   $rootScope.appUnready = () ->
     $scope.appLoaded = false
 
   $scope.onRefresh = () ->
+    if not User.authenticated
+      $scope.$broadcast('scroll.refreshComplete')
+      return  
     $rootScope.updateUser(null,null,()->
         raise_error_message("Successful Update")
     )
@@ -49,6 +52,9 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
 app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$rootScope',\
  'formsService', 'fieldsService','localStorageService',\
  ($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) ->
+  
+  
+
   $scope.signIn = (user, email, secret) ->
     if not (email? and secret?)
       email = user.email
@@ -71,7 +77,7 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
 
   if User.authenticated
     $location.path("/all_forms")
-    $rootScope.$apply()
+    # $rootScope.$apply()
   else if local.email? and local.secret?
     console.log ("authenticating1")
     $scope.signIn("", local['email'], local['secret'])
@@ -126,8 +132,10 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
       $rootScope.stopLoad()
 ]
 
-app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope',\
-($scope, $routeParams, User, formsService, fieldsService, $rootScope)->
+app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope', '$location', \
+($scope, $routeParams, User, formsService, fieldsService, $rootScope, $location)->
+  if not $rootScope.userIsAuthenticated()
+    return
   $scope.current_form_id = $routeParams._id
   $scope.current_form = formsService['data'][$scope.current_form_id]
   console.log ("scope._id, formsService, fieldsService")
@@ -170,6 +178,9 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
           #add orgs to data
           make_request(orgsRoute,"POST",dataOrgs, null, null,"OrgsResponse")
           console.log ("ORGSS DONE")
+          raise_error_message("Form Submitted")
+          $location.path("/mydata")
+          $rootScope.$apply()
 
         data =
           _id: User['data']['_id']
@@ -201,7 +212,9 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
 ]
 
 
-app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, formsService) ->
+app1.controller "FormDisplayController", ['$scope', 'formsService','$rootScope', ($scope, formsService, $rootScope) ->
+    if not $rootScope.userIsAuthenticated()
+      return
     $scope.query =
       name: "Search"
       _id: "formSearch"
@@ -210,22 +223,25 @@ app1.controller "FormDisplayController", ['$scope', 'formsService', ($scope, for
 ]
 
 
-app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', ($scope, User, fieldsService) ->
+app1.controller "MyDataController", ['$scope', 'User', 'fieldsService', '$rootScope', ($scope, User, fieldsService, $rootScope) ->
+    if not $rootScope.userIsAuthenticated()
+      return 
     console.log (User)
-    mydata = {'profile':[],'data':[]}
+    $scope.mydata = []
     console.log ("MYUSER")
     console.log (User)
     for key, value of User['data']['profile']
-      mydata['profile'].push({name: key, value:value})
+      $scope.mydata.push({name: key, value:value, access:"Public"})
     for key, value of User['data']['data']
-      mydata['data'].push({name:fieldsService['data'][key]['name'], value: value['value'], access: value['access']})
-    $scope.mydata = mydata
+      $scope.mydata.push({name:fieldsService['data'][key]['name'], value: value['value'], access: value['access']})
     console.log ("MYDATA")
     console.log ($scope.mydata)
     console.log (fieldsService)
 ]
 
-app1.controller "MyFormsController", ['$scope', 'User', 'fieldsService', 'fieldsService', ($scope, User, fieldsService, formsService) ->
+app1.controller "MyFormsController", ['$scope', 'User', 'fieldsService', 'formsService', '$rootScope', ($scope, User, fieldsService, formsService, $rootScope) ->
+    if not $rootScope.userIsAuthenticated()
+      return 
     console.log (User)
     mydata = {'profile':[],'data':[]}
     console.log ("MYUSER")

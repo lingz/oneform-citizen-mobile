@@ -54,6 +54,18 @@
   app.run([
     "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", "$route", function($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) {
       var _this = this;
+      $rootScope.userIsAuthenticated = function() {
+        if (!User.authenticated) {
+          console.log("not auth");
+          if (User.authenticated === false) {
+            console.log("Running?");
+            raise_error_message("You need to be signed in");
+            $location.path("/sign_in");
+          }
+          return false;
+        }
+        return true;
+      };
       $rootScope.updateUser = function(userEmail, userSecret, userSuccessUpdate) {
         var data, email, secret, success, successFields, successForms, successUpdate;
         successUpdate = function() {
@@ -73,7 +85,6 @@
         };
         console.log(data);
         if ((userEmail != null) && (userSecret != null)) {
-          $rootScope.updateStatus = "start";
           data = {
             email: userEmail,
             secret: userSecret
@@ -82,8 +93,13 @@
         console.log(data);
         email = data['email'];
         secret = data['secret'];
+        if ((email == null) || (secret == null)) {
+          $location.path("/sign_in");
+          raise_error_message("You need to be signed in");
+          User.authenticated = false;
+          return;
+        }
         success = function(data, status, headers, config) {
-          $rootScope.updateStatus = "Users";
           if (data.result != null) {
             console.log("user");
             console.log(User);
@@ -102,13 +118,11 @@
             User.authenticated = false;
             console.log("sending to sign in");
             $location.path("/sign_in");
-            $rootScope.updateStatus = "error";
             return $rootScope.stopLoad();
           }
         };
         successForms = function(data, status, headers, config) {
           var form, formData, _i, _len, _ref;
-          $rootScope.updateStatus = "Forms";
           if (data.result != null) {
             console.log("success here!kjhx;");
             console.log(data.result);
@@ -126,7 +140,6 @@
         };
         successFields = function(data, status, headers, config) {
           var field, fieldData, _i, _len, _ref;
-          $rootScope.updateStatus = "Fields";
           if (data.result != null) {
             console.log(data.result);
             fieldData = {};
@@ -155,7 +168,9 @@
       return $rootScope.$watch(function() {
         return $location.path();
       }, function(next, prev) {
-        if (!User.authenticated && $location.path().search("sign") === -1) {
+        console.log("Local STORAGE");
+        console.log(localStorageService);
+        if (!User.authenticated && ($location.path().search("sign") === -1 || $location.path() !== "/")) {
           $rootScope.updateUser();
           return console.log($location.path());
         }

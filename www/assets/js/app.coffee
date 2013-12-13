@@ -43,6 +43,16 @@ app.config ["$routeProvider", ($routeProvider) ->
 
 app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService","$route",\
  ($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) ->
+  $rootScope.userIsAuthenticated = () ->
+    if not User.authenticated
+      console.log "not auth"
+      if User.authenticated == false
+        console.log "Running?"
+        raise_error_message("You need to be signed in")
+        $location.path("/sign_in")
+      return false   
+    return true
+
   $rootScope.updateUser = (userEmail, userSecret, userSuccessUpdate) ->  
     successUpdate = () ->
       if userSuccessUpdate?
@@ -61,7 +71,6 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
     console.log (data)
 
     if userEmail? and userSecret?
-      $rootScope.updateStatus = "start"
       data = 
         email: userEmail
         secret: userSecret
@@ -69,8 +78,12 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
 
     email = data['email']
     secret = data['secret']
+    if not email? or not secret? 
+      $location.path("/sign_in")
+      raise_error_message("You need to be signed in")
+      User.authenticated = false
+      return
     success = (data, status, headers, config) ->
-      $rootScope.updateStatus = "Users"
       if data.result?
         console.log ("user")
         console.log(User)
@@ -89,10 +102,8 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         User.authenticated = false
         console.log("sending to sign in")
         $location.path("/sign_in")
-        $rootScope.updateStatus = "error"
         $rootScope.stopLoad()
     successForms = (data, status, headers, config) ->
-      $rootScope.updateStatus = "Forms"
       if data.result?
         console.log("success here!kjhx;")
         console.log(data.result)
@@ -104,7 +115,6 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         $rootScope.successCount += 1
         $rootScope.doneDownloading()
     successFields = (data, status, headers, config) ->
-      $rootScope.updateStatus = "Fields"
       if data.result?
         console.log(data.result)
         fieldData = {}
@@ -127,7 +137,9 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
   $rootScope.$watch(
     => $location.path(),
     (next, prev) ->
-      if not User.authenticated and $location.path().search("sign") == -1
+      console.log "Local STORAGE"
+      console.log(localStorageService)
+      if not User.authenticated and ($location.path().search("sign") == -1 or $location.path() != "/")
         $rootScope.updateUser()
         console.log $location.path()
   )

@@ -2,9 +2,9 @@
 <div class="small-query">My Data</div>
 <form novalidate class="simple-form" id="single-form">
   <ol>
-    <input-field ng-repeat="data in mydata['profile']" label="{{data.name}}" field="data.value" disabledstate='true'>
+    <input-field ng-repeat="data in mydata" label="{{data.name}}" field="data.value" disabledstate='true'>
     </input-field>
-    <input-field ng-repeat="data in mydata['data']" label="{{data.name}}" field="data.value" disabledstate='true'>
+    <input-field ng-repeat="data in mydata" label="{{data.name}}" field="data.value" disabledstate='true'>
     </input-field>
   </ol>
   <button class="button button-clear submit medium-text submit" value="Update Data">Update Data</button>
