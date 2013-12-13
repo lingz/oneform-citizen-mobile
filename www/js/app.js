@@ -62,7 +62,7 @@
     "$rootScope", "$location", "User", "fieldsService", "formsService", "localStorageService", "$route", function($rootScope, $location, User, fieldsService, formsService, localStorageService, $route) {
       var _this = this;
       $rootScope.updateUser = function(userEmail, userSecret, userSuccessUpdate) {
-        var data, email, secret, success, successUpdate;
+        var data, email, secret, success, successCount, successFields, successForms, successUpdate;
         successUpdate = function() {
           if (userSuccessUpdate != null) {
             userSuccessUpdate();
@@ -72,6 +72,7 @@
           $route.reload();
           return console.log("Done update");
         };
+        successCount = 0;
         console.log("LOCAL");
         data = {
           email: localStorageService.get('email'),
@@ -89,7 +90,6 @@
         email = data['email'];
         secret = data['secret'];
         success = function(data, status, headers, config) {
-          var successForms;
           $rootScope.updateStatus = "Users";
           if (data.result != null) {
             console.log("user");
@@ -101,41 +101,8 @@
             User.authenticated = true;
             console.log("user");
             console.log(User);
-            successForms = function(data, status, headers, config) {
-              var form, formData, successFields, _i, _len, _ref;
-              $rootScope.updateStatus = "Forms";
-              if (data.result != null) {
-                console.log("success here!kjhx;");
-                console.log(data.result);
-                formsService.orderedData = data.result;
-                formData = {};
-                _ref = data.result;
-                for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                  form = _ref[_i];
-                  formData[form._id] = form;
-                }
-                formsService.data = formData;
-                successFields = function(data, status, headers, config) {
-                  var field, fieldData, _j, _len1, _ref1;
-                  $rootScope.updateStatus = "Fields";
-                  if (data.result != null) {
-                    console.log(data.result);
-                    fieldData = {};
-                    _ref1 = data.result;
-                    for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
-                      field = _ref1[_j];
-                      fieldData[field._id] = field;
-                    }
-                    fieldsService.data = fieldData;
-                    localStorageService.add('email', User.data.profile.email);
-                    localStorageService.add('secret', User.data.secret);
-                    return successUpdate();
-                  }
-                };
-                return make_request("/fields", "GET", null, successFields);
-              }
-            };
-            return make_request("/forms", "GET", null, successForms);
+            successCount += 1;
+            return $rootScope.doneDownloading();
           } else {
             raise_error_message("Incorrect email & password combination");
             localStorageService.clearAll();
@@ -146,6 +113,49 @@
             return $rootScope.stopLoad();
           }
         };
+        successForms = function(data, status, headers, config) {
+          var form, formData, _i, _len, _ref;
+          $rootScope.updateStatus = "Forms";
+          if (data.result != null) {
+            console.log("success here!kjhx;");
+            console.log(data.result);
+            formsService.orderedData = data.result;
+            formData = {};
+            _ref = data.result;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              form = _ref[_i];
+              formData[form._id] = form;
+            }
+            formsService.data = formData;
+            successCount += 1;
+            return $rootScope.doneDownloading();
+          }
+        };
+        successFields = function(data, status, headers, config) {
+          var field, fieldData, _i, _len, _ref;
+          $rootScope.updateStatus = "Fields";
+          if (data.result != null) {
+            console.log(data.result);
+            fieldData = {};
+            _ref = data.result;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              field = _ref[_i];
+              fieldData[field._id] = field;
+            }
+            fieldsService.data = fieldData;
+            successCount += 1;
+            return $rootScope.doneDownloading();
+          }
+        };
+        $rootScope.doneDownloading = function() {
+          if (successCount === 3) {
+            localStorageService.add('email', User.data.profile.email);
+            localStorageService.add('secret', User.data.secret);
+            return successUpdate();
+          }
+        };
+        make_request("/fields", "GET", null, successFields);
+        make_request("/forms", "GET", null, successForms);
         return make_request("/auth/users", "POST", data, success);
       };
       return $rootScope.$watch(function() {

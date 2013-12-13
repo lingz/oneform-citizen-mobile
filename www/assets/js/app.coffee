@@ -56,6 +56,8 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
       $rootScope.$apply()
       $route.reload()
       console.log ("Done update")
+
+    successCount = 0
     
     console.log ("LOCAL")
     data = 
@@ -84,30 +86,8 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         User.authenticated = true
         console.log ("user")
         console.log(User)
-        successForms = (data, status, headers, config) ->
-          $rootScope.updateStatus = "Forms"
-          if data.result?
-            console.log("success here!kjhx;")
-            console.log(data.result)
-            formsService.orderedData = data.result
-            formData = {}
-            for form in data.result
-              formData[form._id] = form
-            formsService.data = formData
-            successFields = (data, status, headers, config) ->
-              $rootScope.updateStatus = "Fields"
-              if data.result?
-                console.log(data.result)
-                fieldData = {}
-                for field in data.result
-                  fieldData[field._id] = field
-                fieldsService.data = fieldData
-                localStorageService.add('email', User.data.profile.email)
-                localStorageService.add('secret', User.data.secret)
-                successUpdate()
-            make_request("/fields", "GET", null, successFields)
-        make_request("/forms", "GET", null, successForms)
-          
+        successCount += 1
+        $rootScope.doneDownloading()
       else
         raise_error_message("Incorrect email & password combination")
         localStorageService.clearAll()
@@ -116,6 +96,37 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         $location.path("/sign_in")
         $rootScope.updateStatus = "error"
         $rootScope.stopLoad()
+    successForms = (data, status, headers, config) ->
+      $rootScope.updateStatus = "Forms"
+      if data.result?
+        console.log("success here!kjhx;")
+        console.log(data.result)
+        formsService.orderedData = data.result
+        formData = {}
+        for form in data.result
+          formData[form._id] = form
+        formsService.data = formData
+        successCount += 1
+        $rootScope.doneDownloading()
+    successFields = (data, status, headers, config) ->
+      $rootScope.updateStatus = "Fields"
+      if data.result?
+        console.log(data.result)
+        fieldData = {}
+        for field in data.result
+          fieldData[field._id] = field
+        fieldsService.data = fieldData
+        successCount += 1
+        $rootScope.doneDownloading()
+
+    $rootScope.doneDownloading = () ->
+      if successCount == 3
+        localStorageService.add('email', User.data.profile.email)
+        localStorageService.add('secret', User.data.secret)
+        successUpdate()
+
+    make_request("/fields", "GET", null, successFields)
+    make_request("/forms", "GET", null, successForms)
     make_request("/auth/users", "POST", data, success)
   
   $rootScope.$watch(
