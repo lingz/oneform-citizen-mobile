@@ -35,10 +35,14 @@
         return $scope.loadingMessage = loadingMessage ? loadingMessage : "Loading...";
       };
       $rootScope.stopLoad = function() {
+        var phase;
         $scope.appLoaded = true;
         $scope.isLoading = false;
         $scope.loadingMessage = "Loading...";
-        return $rootScope.$apply();
+        phase = $scope.$root.$$phase;
+        if (phase !== "$apply" && phase !== "$digest") {
+          return $rootScope.$apply();
+        }
       };
       $rootScope.appReady = function() {
         return $scope.appLoaded = true;
@@ -307,22 +311,6 @@
       console.log("MYDATA");
       console.log($scope.mydata);
       return console.log(fieldsService);
-    }
-  ]);
-
-  app1.controller("IndexController", [
-    '$rootscope', 'User', function($rootscope, User) {
-      var onRefresh;
-      $scope.status = "Pull to reload";
-      return onRefresh = function() {
-        var email, secret;
-        $scope.status = "Refreshing";
-        if (User.authenticated != null) {
-          email = User.profile.email;
-          secret = User.secret;
-          return $rootScope.updateUser(email, secret);
-        }
-      };
     }
   ]);
 

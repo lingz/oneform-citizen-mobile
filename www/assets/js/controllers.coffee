@@ -30,7 +30,9 @@ app1.controller "menuController", ['$scope', '$location', '$rootScope', ($scope,
     $scope.appLoaded = true
     $scope.isLoading = false
     $scope.loadingMessage = "Loading..."
-    $rootScope.$apply()
+    phase = $scope.$root.$$phase
+    if phase != "$apply" and phase != "$digest"
+      $rootScope.$apply()
 
   $rootScope.appReady = () ->
     $scope.appLoaded = true
@@ -238,12 +240,3 @@ app1.controller "MyFormsController", ['$scope', 'User', 'fieldsService', 'fields
     console.log (fieldsService)
 ]
 
-app1.controller "IndexController", ['$rootscope', 'User', ($rootscope, User) ->
-  $scope.status = "Pull to reload"
-  onRefresh = ()->
-    $scope.status = "Refreshing"
-    if User.authenticated?
-      email = User.profile.email
-      secret = User.secret
-      $rootScope.updateUser(email,secret)
-]
