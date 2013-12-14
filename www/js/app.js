@@ -155,8 +155,8 @@
         };
         $rootScope.doneDownloading = function() {
           if ($rootScope.successCount === 3) {
-            localStorageService.add('email', User.data.profile.email);
-            localStorageService.add('secret', User.data.secret);
+            localStorageService.add('email', email);
+            localStorageService.add('secret', secret);
             successUpdate();
             return $rootScope.successCount = 0;
           }
@@ -170,7 +170,7 @@
       }, function(next, prev) {
         console.log("Local STORAGE");
         console.log(localStorageService);
-        if (!User.authenticated && ($location.path().search("sign") === -1 || $location.path() !== "/")) {
+        if (!User.authenticated && !($location.path().search("sign") === -1 || $location.path() !== "/")) {
           $rootScope.updateUser();
           return console.log($location.path());
         }

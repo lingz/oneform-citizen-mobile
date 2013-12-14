@@ -24,6 +24,9 @@ body input, body input[type="text"], body input[type="password"] {
   color: #180853;
   font-weight: 300;
   display: inline; }
+body label {
+  width: 100%;
+  text-align: left; }
 
 .description {
   color: #95979a;

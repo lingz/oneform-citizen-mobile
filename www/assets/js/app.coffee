@@ -123,10 +123,11 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
         fieldsService.data = fieldData
         $rootScope.successCount += 1
         $rootScope.doneDownloading()
+
     $rootScope.doneDownloading = () ->
       if $rootScope.successCount == 3
-        localStorageService.add('email', User.data.profile.email)
-        localStorageService.add('secret', User.data.secret)
+        localStorageService.add('email', email)
+        localStorageService.add('secret', secret)
         successUpdate()
         $rootScope.successCount = 0
 
@@ -139,7 +140,7 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
     (next, prev) ->
       console.log "Local STORAGE"
       console.log(localStorageService)
-      if not User.authenticated and ($location.path().search("sign") == -1 or $location.path() != "/")
+      if not User.authenticated and not ($location.path().search("sign") == -1 or $location.path() != "/")
         $rootScope.updateUser()
         console.log $location.path()
   )
