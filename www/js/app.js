@@ -170,7 +170,9 @@
       }, function(next, prev) {
         console.log("Local STORAGE");
         console.log(localStorageService);
-        if (!User.authenticated && !($location.path().search("sign") === -1 || $location.path() !== "/")) {
+        console.log($location.path().search("sign") === -1);
+        if (!User.authenticated && !($location.path().search("sign") !== -1 || $location.path() === "/")) {
+          console.log("getting");
           $rootScope.updateUser();
           return console.log($location.path());
         }

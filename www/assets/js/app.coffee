@@ -140,7 +140,9 @@ app.run ["$rootScope", "$location", "User", "fieldsService", "formsService", "lo
     (next, prev) ->
       console.log "Local STORAGE"
       console.log(localStorageService)
-      if not User.authenticated and not ($location.path().search("sign") == -1 or $location.path() != "/")
+      console.log $location.path().search("sign") == -1
+      if not User.authenticated and not ($location.path().search("sign") != -1 or $location.path() == "/")
+        console.log("getting")
         $rootScope.updateUser()
         console.log $location.path()
   )

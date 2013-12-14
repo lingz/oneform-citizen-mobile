@@ -161,7 +161,6 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
       $scope.status = "sending"
       succesfullUpload = true
       for field in fieldData
-
         successData = (data,textStatus,jqXHR) ->
           console.log ("data result")
           console.log (data)
