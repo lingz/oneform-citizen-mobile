@@ -90,22 +90,6 @@ app1.controller "SignUpController", ['$scope', '$location', '$rootScope', 'local
   $rootScope.appReady()
   $rootScope.stopLoad()
   $scope.userSignUp= {}
-  $scope.user =
-    firstName:
-      name: "First Name"
-      id: "firstName"
-    lastName:
-      name: "Last Name"
-      id: "lastName"
-    email:
-      name: "Email"
-      id: "email"
-    uniqueId:
-      name: "UDID (Emirates Id Number)"
-      id: "internalId"
-    password:
-      name: "Password"
-      id: "password"
 
   $scope.signUp = (user) ->
     console.log("creating user")
