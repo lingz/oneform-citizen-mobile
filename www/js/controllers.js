@@ -150,12 +150,7 @@
         field_id = _ref[_i];
         $scope.fields.push(fieldsService.data[field_id]);
       }
-      console.log("FLIEDSSSS");
-      console.log($scope.fields);
-      console.log(User);
       $scope.mydata = [];
-      console.log("MYUSER");
-      console.log(User);
       _ref1 = User['data']['profile'];
       for (key in _ref1) {
         value = _ref1[key];
@@ -174,10 +169,6 @@
           access: value['access']
         });
       }
-      console.log("MYDATA");
-      console.log($scope.mydata);
-      console.log(fieldsService);
-      console.log("length");
       length = $scope.fields.length;
       for (number = _j = length; length <= 0 ? _j <= 0 : _j >= 0; number = length <= 0 ? ++_j : --_j) {
         number = number - 1;
@@ -185,15 +176,12 @@
           console.log("Breaking");
           break;
         }
-        console.log("FIELD: ");
-        console.log(number);
-        console.log($scope.fields[number]);
-        console.log("this");
         _ref3 = $scope.mydata;
         for (_k = 0, _len1 = _ref3.length; _k < _len1; _k++) {
           data = _ref3[_k];
           if (data.name === $scope.fields[number].name) {
             $scope.fields[number].value = data.value;
+            $scope.fields[number].prefilled = true;
             break;
           }
         }

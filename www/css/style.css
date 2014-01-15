@@ -181,6 +181,9 @@ html, body, h1, h2, h3, h4, h5, h6, input {
     border: none;
     padding-left: 2px; }
 
+.prefilled li input {
+  color: #505050; }
+
 .small-query {
   background-color: #b8b9cd;
   font-size: 2em;
