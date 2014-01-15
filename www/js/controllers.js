@@ -102,28 +102,6 @@
       $rootScope.appReady();
       $rootScope.stopLoad();
       $scope.userSignUp = {};
-      $scope.user = {
-        firstName: {
-          name: "First Name",
-          id: "firstName"
-        },
-        lastName: {
-          name: "Last Name",
-          id: "lastName"
-        },
-        email: {
-          name: "Email",
-          id: "email"
-        },
-        uniqueId: {
-          name: "UDID (Emirates Id Number)",
-          id: "internalId"
-        },
-        password: {
-          name: "Password",
-          id: "password"
-        }
-      };
       return $scope.signUp = function(user) {
         var originalData, success;
         console.log("creating user");
@@ -156,7 +134,7 @@
 
   app1.controller("FormController", [
     '$scope', '$routeParams', 'User', 'formsService', 'fieldsService', '$rootScope', '$location', function($scope, $routeParams, User, formsService, fieldsService, $rootScope, $location) {
-      var field_id, _i, _len, _ref;
+      var data, field_id, key, length, number, value, _i, _j, _k, _len, _len1, _ref, _ref1, _ref2, _ref3;
       if (!$rootScope.userIsAuthenticated()) {
         return;
       }
@@ -172,9 +150,55 @@
         field_id = _ref[_i];
         $scope.fields.push(fieldsService.data[field_id]);
       }
+      console.log("FLIEDSSSS");
       console.log($scope.fields);
+      console.log(User);
+      $scope.mydata = [];
+      console.log("MYUSER");
+      console.log(User);
+      _ref1 = User['data']['profile'];
+      for (key in _ref1) {
+        value = _ref1[key];
+        $scope.mydata.push({
+          name: key,
+          value: value,
+          access: "Public"
+        });
+      }
+      _ref2 = User['data']['data'];
+      for (key in _ref2) {
+        value = _ref2[key];
+        $scope.mydata.push({
+          name: fieldsService['data'][key]['name'],
+          value: value['value'],
+          access: value['access']
+        });
+      }
+      console.log("MYDATA");
+      console.log($scope.mydata);
+      console.log(fieldsService);
+      console.log("length");
+      length = $scope.fields.length;
+      for (number = _j = length; length <= 0 ? _j <= 0 : _j >= 0; number = length <= 0 ? ++_j : --_j) {
+        number = number - 1;
+        if (number < 0) {
+          console.log("Breaking");
+          break;
+        }
+        console.log("FIELD: ");
+        console.log(number);
+        console.log($scope.fields[number]);
+        console.log("this");
+        _ref3 = $scope.mydata;
+        for (_k = 0, _len1 = _ref3.length; _k < _len1; _k++) {
+          data = _ref3[_k];
+          if (data.name === $scope.fields[number].name) {
+            $scope.fields[number].value = data.value;
+            break;
+          }
+        }
+      }
       $scope.update = function(fieldName, answer) {
-        var data;
         if ($scope.fieldName.$valid && UserService.isLogged === true) {
           return data = {
             id: UserService.data["id"],
@@ -183,14 +207,14 @@
         }
       };
       return $scope.post_form = function() {
-        var data, dataForm, field, fieldData, route, routeForm, succesfullUpload, successData, _j, _len1;
+        var dataForm, field, fieldData, route, routeForm, succesfullUpload, successData, _l, _len2;
         console.log(User);
         fieldData = $scope.fields;
         if (fieldData != null) {
           $scope.status = "sending";
           succesfullUpload = true;
-          for (_j = 0, _len1 = fieldData.length; _j < _len1; _j++) {
-            field = fieldData[_j];
+          for (_l = 0, _len2 = fieldData.length; _l < _len2; _l++) {
+            field = fieldData[_l];
             successData = function(data, textStatus, jqXHR) {
               var dataOrgs, orgsRoute;
               console.log("data result");

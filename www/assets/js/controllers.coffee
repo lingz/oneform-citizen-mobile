@@ -53,7 +53,6 @@ app1.controller "SignInController", ['$scope', '$http', 'User', '$location', '$r
  'formsService', 'fieldsService','localStorageService',\
  ($scope, $http, User, $location, $rootScope, formsService, fieldsService, localStorageService) ->
   
-  
 
   $scope.signIn = (user, email, secret) ->
     if not (email? and secret?)
@@ -129,7 +128,36 @@ app1.controller "FormController", [ '$scope', '$routeParams', 'User', 'formsServ
   $scope.fields = []
   for field_id in formsService.data[$scope.current_form_id].fields
     $scope.fields.push(fieldsService.data[field_id])
+  console.log("FLIEDSSSS")
   console.log($scope.fields)
+#New Stuff
+  console.log (User)
+  $scope.mydata = []
+  console.log ("MYUSER")
+  console.log (User)
+  for key, value of User['data']['profile']
+    $scope.mydata.push({name: key, value:value, access:"Public"})
+  for key, value of User['data']['data']
+    $scope.mydata.push({name:fieldsService['data'][key]['name'], value: value['value'], access: value['access']})
+  console.log ("MYDATA")
+  console.log ($scope.mydata)
+  console.log (fieldsService)
+#New Stuff
+  console.log ("length")
+  length = $scope.fields.length
+  for number in [length..0]
+    number  = number - 1
+    if number < 0
+        console.log ("Breaking")
+        break
+    console.log("FIELD: ")
+    console.log(number) 
+    console.log ($scope.fields[number])
+    console.log ("this")
+    for data in $scope.mydata
+      if data.name == $scope.fields[number].name
+        $scope.fields[number].value = data.value
+        break
 
   $scope.update = (fieldName,answer) ->
     if $scope.fieldName.$valid and UserService.isLogged is true
