@@ -26,7 +26,8 @@ body input, body input[type="text"], body input[type="password"] {
   display: inline; }
 body label {
   width: 100%;
-  text-align: left; }
+  text-align: left;
+  white-space: nowrap; }
 
 .description {
   color: #95979a;
